@@ -1,0 +1,1095 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GenPowerpoint  AI Slide Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { DEFAULT: '#2563eb', dark: '#1d4ed8', light: '#eff6ff' } } } }
+    }
+  </script>
+  <style>
+    .drag-over { border-color: #2563eb !important; background-color: #eff6ff !important; }
+    .step-line { flex: 1; height: 2px; background: #e2e8f0; }
+    .step-line.done { background: #2563eb; }
+    .step-section { transition: opacity .3s ease, transform .3s ease; }
+    .step-section.hidden-step { opacity: 0; pointer-events: none; height: 0; overflow: hidden; transform: translateY(8px); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { display: inline-block; width: 1rem; height: 1rem; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; }
+    textarea::-webkit-scrollbar { width: 6px; }
+    textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 font-sans text-slate-800">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+      <svg class="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M8 21h8M12 17v4M7 8h5M7 11.5h3"/>
+        <rect x="14" y="7" width="4" height="5" rx="1" fill="currentColor" stroke="none"/>
+      </svg>
+      <div>
+        <h1 class="text-lg font-bold text-blue-600 leading-none">GenPowerpoint</h1>
+        <p class="text-xs text-slate-400">AI-powered slide generator</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-8 space-y-8">
+
+    <!-- Stepper -->
+    <div class="flex items-center gap-0">
+      <div class="flex items-center gap-2">
+        <div id="stepCircle1" class="w-9 h-9 rounded-full bg-blue-600 text-white text-sm font-bold flex items-center justify-center shadow-md transition-all duration-300">1</div>
+        <span id="stepLabel1" class="text-sm font-semibold text-blue-600 hidden sm:inline">Upload Master</span>
+      </div>
+      <div class="step-line mx-2" id="line1"></div>
+      <div class="flex items-center gap-2">
+        <div id="stepCircle2" class="w-9 h-9 rounded-full bg-slate-200 text-slate-500 text-sm font-bold flex items-center justify-center transition-all duration-300">2</div>
+        <span id="stepLabel2" class="text-sm font-semibold text-slate-400 hidden sm:inline">Paste AI Response</span>
+      </div>
+      <div class="step-line mx-2" id="line2"></div>
+      <div class="flex items-center gap-2">
+        <div id="stepCircle3" class="w-9 h-9 rounded-full bg-slate-200 text-slate-500 text-sm font-bold flex items-center justify-center transition-all duration-300">3</div>
+        <span id="stepLabel3" class="text-sm font-semibold text-slate-400 hidden sm:inline">Generate PPTX</span>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <section id="section1" class="step-section space-y-5">
+
+      <!-- Saved Masters panel -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <button onclick="toggleSavedPanel()"
+                class="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Master đã lưu
+            <span id="masterBadge" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+          </span>
+          <svg id="savedPanelChevron" class="w-4 h-4 text-slate-400 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div id="savedPanel" class="hidden border-t border-slate-100">
+          <div id="savedMastersList" class="divide-y divide-slate-100 max-h-64 overflow-y-auto">
+            <p class="px-6 py-4 text-sm text-slate-400">Chưa có master nào được lưu.</p>
+          </div>
+        </div>
+      </div>
+      <!-- Mode toggle -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Ch&#7871; &#273;&#7897; t&#7841;o slide</p>
+        <div class="flex gap-2">
+          <button id="modeUploadBtn" onclick="setMode('master')"
+                  class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600">
+            &#128194; Upload Master PPTX
+          </button>
+          <button id="modeProfileBtn" onclick="setMode('profile')"
+                  class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
+            &#10024; D&ugrave;ng Template c&oacute; s&#7861;n
+          </button>
+        </div>
+        <div id="profileModeInfo" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700">
+          <strong>VTI Japan Profile</strong> &mdash; 7 layouts, font <em>Meiryo UI</em>, m&agrave;u ch&#7911; <span class="font-mono">#C00000</span>. Kh&ocirc;ng c&#7847;n upload file PPTX.
+        </div>
+      </div>
+
+      <!-- Upload section (hidden in profile mode) -->
+      <div id="uploadSection">      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
+        <h2 class="text-base font-semibold text-slate-700">Step 1 — Upload your Master PPTX</h2>
+        <div id="dropZone"
+             class="border-2 border-dashed border-slate-300 rounded-xl p-10 text-center cursor-pointer transition-colors duration-200 hover:border-blue-400 hover:bg-blue-50"
+             onclick="document.getElementById('pptxFile').click()"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)">
+          <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 16V4m0 0L8 8m4-4 4 4"/>
+            <path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/>
+          </svg>
+          <p class="text-slate-600 font-medium">Drop your <span class="text-blue-600">.pptx</span> file here</p>
+          <p class="text-slate-400 text-sm mt-1">or click to browse</p>
+          <input type="file" id="pptxFile" accept=".pptx" class="hidden" onchange="handleFileSelect(event)" />
+        </div>
+
+        <div id="filePill" class="hidden items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+          <svg class="w-4 h-4 text-blue-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span id="fileName" class="text-sm text-blue-700 font-medium truncate flex-1"></span>
+          <button onclick="resetFile()" class="text-slate-400 hover:text-red-500 transition-colors text-xs bg-transparent border-0 cursor-pointer p-0">&#x2715;</button>
+        </div>
+
+        <button id="uploadBtn" onclick="uploadFile()"
+                class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                disabled>
+          <span id="uploadBtnText">Scan Layouts</span>
+        </button>
+        <p id="uploadStatus" class="text-sm text-slate-400 hidden"></p>
+      </div>
+      </div><!-- /#uploadSection -->
+
+      <div id="layoutResult" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h3 class="font-semibold text-slate-700" id="layoutSummary">Layouts found</h3>
+          <div class="flex items-center gap-2">
+            <button onclick="openEditModal()"
+                    class="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Chỉnh sửa Layout
+            </button>
+            <button onclick="copyPrompt()" id="copyBtn"
+                    class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-colors">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span id="copyBtnText">Copy Prompt for AI</span>
+            </button>
+          </div>
+        </div>
+        <div id="layoutAccordion" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+
+        <!-- Deep Scan Profile Panel -->
+        <div id="deepScanPanel" class="hidden border border-indigo-100 bg-indigo-50/50 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-semibold text-indigo-700">&#128270; Deep Scan Profile</h4>
+            <button onclick="toggleDeepDetail()" class="text-xs text-indigo-500 hover:text-indigo-700 transition-colors">
+              <span id="deepDetailToggleText">Show detail</span>
+            </button>
+          </div>
+          <div id="deepScanSummary" class="space-y-2">
+            <!-- Color palette -->
+            <div id="dsColors" class="flex flex-wrap gap-1.5 items-center">
+              <span class="text-xs text-slate-500 mr-1">Colors:</span>
+            </div>
+            <!-- Font summary -->
+            <div id="dsFonts" class="text-xs text-slate-600"></div>
+            <!-- Canvas -->
+            <div id="dsCanvas" class="text-xs text-slate-500"></div>
+          </div>
+          <div id="deepScanDetail" class="hidden space-y-2 max-h-64 overflow-y-auto">
+            <pre id="dsProfileJson" class="text-[11px] bg-white border border-indigo-100 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap text-slate-600"></pre>
+          </div>
+        </div>
+
+        <!-- Presentation details -->
+        <div class="border-t border-slate-100 pt-4 space-y-3">
+          <p class="text-sm font-semibold text-slate-600">Thông tin bài thuyết trình</p>
+
+          <div>
+            <label for="slideTopic" class="block text-xs font-medium text-slate-500 mb-1">Nội dung / Chủ đề muốn làm slide <span class="text-red-400">*</span></label>
+            <textarea id="slideTopic" rows="3"
+                      placeholder="Ví dụ: Giới thiệu sản phẩm X cho khách hàng doanh nghiệp, tập trung vào tính năng nổi bật và lợi ích ROI"
+                      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"></textarea>
+          </div>
+
+          <div class="flex gap-3">
+            <div class="flex-1">
+              <label for="slideCount" class="block text-xs font-medium text-slate-500 mb-1">Số lượng slide</label>
+              <input type="number" id="slideCount" value="7" min="1" max="50"
+                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition" />
+            </div>
+            <div class="flex-[2]">
+              <label for="slideLanguage" class="block text-xs font-medium text-slate-500 mb-1">Ngôn ngữ trong slide</label>
+              <select id="slideLanguage"
+                      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                <option value="Tiếng Việt">🇻🇳 Tiếng Việt</option>
+                <option value="English">🇬🇧 English</option>
+                <option value="日本語">🇯🇵 日本語</option>
+                <option value="한국어">🇰🇷 한국어</option>
+                <option value="中文（简体）">🇨🇳 中文（简体）</option>
+                <option value="Français">🇫🇷 Français</option>
+                <option value="Deutsch">🇩🇪 Deutsch</option>
+                <option value="Español">🇪🇸 Español</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="goToStep2()"
+                class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">
+          Continue to Step 2 &#8594;
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="section2" class="step-section hidden-step space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
+        <h2 class="text-base font-semibold text-slate-700">Step 2  Paste the AI JSON Response</h2>
+        <p class="text-sm text-slate-500">Open your AI assistant, paste the copied prompt, then paste the AI reply below.</p>
+
+        <div class="flex flex-wrap gap-2">
+          <a href="https://gemini.google.com" target="_blank"
+             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-xs font-medium rounded-lg border border-slate-200 transition-colors">
+             Gemini
+          </a>
+          <a href="https://grok.x.ai" target="_blank"
+             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-xs font-medium rounded-lg border border-slate-200 transition-colors">
+             Grok
+          </a>
+          <a href="https://chat.openai.com" target="_blank"
+             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-xs font-medium rounded-lg border border-slate-200 transition-colors">
+             ChatGPT
+          </a>
+        </div>
+
+        <textarea id="aiJsonInput" rows="12"
+                  placeholder='Paste the AI response here. Expected format:
+[
+  {
+    "layout_index": 0,
+    "placeholders": { "0": "Title", "1": "Subtitle" }
+  }
+]'
+                  class="w-full border border-slate-200 rounded-xl p-4 text-sm font-mono text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"></textarea>
+
+        <div id="jsonValidation" class="hidden text-sm rounded-lg px-4 py-2"></div>
+
+        <div class="flex gap-3">
+          <button onclick="goToStep1()"
+                  class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-colors">
+            &#8592; Back
+          </button>
+          <button onclick="validateAndProceed()"
+                  class="flex-[2] py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">
+            Validate &amp; Continue &#8594;
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="section3" class="step-section hidden-step space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-5">
+        <h2 class="text-base font-semibold text-slate-700">Step 3  Generate your PowerPoint</h2>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm space-y-1">
+          <p class="font-semibold text-blue-700">Ready to generate</p>
+          <p class="text-slate-600">Master file: <span id="summaryFile" class="font-medium text-slate-800"></span></p>
+          <p class="text-slate-600">Slides in JSON: <span id="summarySlides" class="font-medium text-slate-800"></span></p>
+        </div>
+
+        <details class="group">
+          <summary class="cursor-pointer select-none text-sm font-medium text-slate-500 hover:text-blue-600 flex items-center gap-1 list-none">
+            <svg class="w-4 h-4 transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            Preview JSON
+          </summary>
+          <pre id="jsonPreview" class="mt-3 bg-slate-900 text-emerald-300 text-xs rounded-xl p-4 overflow-auto max-h-56 whitespace-pre-wrap break-words"></pre>
+        </details>
+
+        <button id="generateBtn" onclick="generatePptx()"
+                class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+          </svg>
+          <span id="generateBtnText">Generate Final PowerPoint</span>
+        </button>
+
+        <div id="generateStatus" class="hidden text-sm rounded-lg px-4 py-3"></div>
+
+        <a id="downloadLink" href="#" download
+           class="hidden w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 4v12m0 0l-4-4m4 4 4-4"/><path d="M4 20h16"/>
+          </svg>
+          Download PowerPoint
+        </a>
+
+        <button onclick="goToStep2()"
+                class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-xl transition-colors text-sm">
+          &#8592; Back to Step 2
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Edit Layout Modal -->
+  <div id="editModal"
+       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm hidden"
+       onclick="closeEditModalOutside(event)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800">Chỉnh sửa cấu trúc Layout</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-700 transition-colors bg-transparent border-0 cursor-pointer">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="px-6 py-3 bg-amber-50 border-b border-amber-100">
+        <p class="text-xs text-amber-700">⚠&#xfe0f; Chỉnh sửa trực tiếp cấu trúc JSON layout. Thay đổi sẽ ảnh hưởng đến prompt AI và được lưu trên server.</p>
+      </div>
+
+      <div class="flex-1 overflow-hidden px-6 py-4">
+        <textarea id="editModalJson" spellcheck="false"
+                  class="w-full h-80 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none overflow-auto"></textarea>
+        <div id="editModalError" class="hidden mt-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
+      </div>
+
+      <div class="px-6 pb-5 flex gap-3">
+        <button onclick="closeEditModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-colors text-sm">Hủy</button>
+        <button onclick="resetLayoutFromServer()" class="flex-1 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold rounded-xl transition-colors text-sm">Khôi phục gốc</button>
+        <button onclick="saveLayoutEdits()" id="saveLayoutBtn" class="flex-[2] py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
+          <span id="saveLayoutBtnText">Lưu thay đổi</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"
+       class="fixed bottom-6 right-6 bg-slate-800 text-white text-sm font-medium px-5 py-3 rounded-xl shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 flex items-center gap-2 z-50">
+    <span id="toastIcon">&#10003;</span>
+    <span id="toastMsg"></span>
+  </div>
+
+  <script>
+    /*  State  */
+    let currentStep = 1;
+    let layoutData = null;
+    let uploadedFilename = "";
+    let validatedJson = null;
+    let useBuiltinProfile = false;
+    let builtinLayoutSchema = null;
+    let deepScanData = null;
+    let deepDetailVisible = false;
+
+    /*  Step navigation  */
+    function showStep(step) {
+      [1, 2, 3].forEach(n => {
+        const sec    = document.getElementById('section' + n);
+        const circle = document.getElementById('stepCircle' + n);
+        const label  = document.getElementById('stepLabel' + n);
+        const line   = document.getElementById('line' + n);
+        if (n === step) {
+          sec.classList.remove('hidden-step');
+          circle.className = 'w-9 h-9 rounded-full bg-blue-600 text-white text-sm font-bold flex items-center justify-center shadow-md transition-all duration-300';
+          circle.textContent = n;
+          label.className  = 'text-sm font-semibold text-blue-600 hidden sm:inline';
+        } else if (n < step) {
+          sec.classList.add('hidden-step');
+          circle.className = 'w-9 h-9 rounded-full bg-emerald-500 text-white text-sm font-bold flex items-center justify-center transition-all duration-300';
+          circle.textContent = '\u2713';
+          label.className  = 'text-sm font-semibold text-emerald-600 hidden sm:inline';
+          if (line) line.classList.add('done');
+        } else {
+          sec.classList.add('hidden-step');
+          circle.className = 'w-9 h-9 rounded-full bg-slate-200 text-slate-500 text-sm font-bold flex items-center justify-center transition-all duration-300';
+          circle.textContent = n;
+          label.className  = 'text-sm font-semibold text-slate-400 hidden sm:inline';
+          if (line) line.classList.remove('done');
+        }
+      });
+      currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToStep1() { showStep(1); }
+    function goToStep2() { showStep(2); }
+    function goToStep3() {
+      document.getElementById('summaryFile').textContent   = useBuiltinProfile ? 'VTI Japan Profile (built-in)' : uploadedFilename;
+      document.getElementById('summarySlides').textContent = Array.isArray(validatedJson) ? validatedJson.length : '';
+      document.getElementById('jsonPreview').textContent   = JSON.stringify(validatedJson, null, 2);
+      document.getElementById('downloadLink').classList.add('hidden');
+      document.getElementById('generateStatus').classList.add('hidden');
+      showStep(3);
+    }
+
+    /*  Toast  */
+    let toastTimer;
+    function showToast(msg, icon, duration) {
+      icon = icon || '\u2713';
+      duration = duration || 2800;
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent  = msg;
+      document.getElementById('toastIcon').textContent = icon;
+      t.style.opacity = '1';
+      t.style.pointerEvents = 'auto';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() { t.style.opacity = '0'; t.style.pointerEvents = 'none'; }, duration);
+    }
+
+    /*  Drag & Drop  */
+    function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+    function handleDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.remove('drag-over');
+      var file = e.dataTransfer.files[0];
+      if (file) applyFile(file);
+    }
+    function handleFileSelect(e) { var file = e.target.files[0]; if (file) applyFile(file); }
+    function applyFile(file) {
+      if (!file.name.toLowerCase().endsWith('.pptx')) { showToast('Only .pptx files are supported.', '\u2715'); return; }
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('filePill').classList.remove('hidden');
+      document.getElementById('filePill').classList.add('flex');
+      document.getElementById('uploadBtn').disabled = false;
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('pptxFile').files = dt.files;
+    }
+    function resetFile() {
+      document.getElementById('pptxFile').value = '';
+      document.getElementById('filePill').classList.add('hidden');
+      document.getElementById('filePill').classList.remove('flex');
+      document.getElementById('uploadBtn').disabled = true;
+      document.getElementById('layoutResult').classList.add('hidden');
+      document.getElementById('uploadStatus').classList.add('hidden');
+    }
+
+    /*  Step 1: Upload  */
+    async function uploadFile() {
+      var input  = document.getElementById('pptxFile');
+      var btn    = document.getElementById('uploadBtn');
+      var status = document.getElementById('uploadStatus');
+      if (!input.files.length) return;
+      var formData = new FormData();
+      formData.append('file', input.files[0]);
+      btn.disabled = true;
+      document.getElementById('uploadBtnText').innerHTML = '<span class="spinner"></span>&nbsp;Scanning\u2026';
+      status.className = 'text-sm text-slate-400';
+      status.textContent = '';
+      status.classList.remove('hidden');
+      try {
+        var res  = await fetch('/upload_master', { method: 'POST', body: formData });
+        var data = await res.json();
+        if (!res.ok) { setUploadError(data.error || 'Upload failed.'); return; }
+        layoutData       = data.layouts;
+        uploadedFilename = data.filename;
+        renderLayoutTable(data);
+        document.getElementById('layoutResult').classList.remove('hidden');
+        status.textContent = '\u2714  ' + data.total_layouts + ' layout(s) loaded successfully.';
+        status.className   = 'text-sm text-emerald-600';
+
+        // Show deep scan profile if available
+        if (data.deep_scan) {
+          renderDeepScanPanel(data.deep_scan);
+          // Also store deep scan for the AI prompt
+          deepScanData = data.deep_scan;
+        }
+      } catch (err) {
+        setUploadError('Network error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        document.getElementById('uploadBtnText').textContent = 'Scan Layouts';
+      }
+    }
+    function setUploadError(msg) {
+      var s = document.getElementById('uploadStatus');
+      s.textContent = msg; s.className = 'text-sm text-red-500'; s.classList.remove('hidden');
+    }
+
+    /*  Render layout accordion  */
+    function renderLayoutTable(data) {
+      document.getElementById('layoutSummary').textContent = data.total_layouts + ' layout(s) in "' + data.filename + '"';
+      var container = document.getElementById('layoutAccordion');
+      container.innerHTML = '';
+
+      // Build a ph details lookup from deep scan if available
+      var dsLayouts = {};
+      if (deepScanData && deepScanData.master_profile) {
+        (deepScanData.master_profile.layouts || []).forEach(function(l) {
+          var phMap = {};
+          (l.placeholders || []).forEach(function(p) { phMap[p.idx] = p; });
+          dsLayouts[l.layout_index] = phMap;
+        });
+        (deepScanData.master_structure && deepScanData.master_structure.additional_layouts || []).forEach(function(l) {
+          var phMap = {};
+          (l.placeholders || []).forEach(function(p) { phMap[p.idx] = p; });
+          dsLayouts[l.layout_index] = phMap;
+        });
+      }
+
+      data.layouts.forEach(function(layout) {
+        var wrap = document.createElement('details');
+        wrap.className = 'bg-slate-50 border border-slate-200 rounded-xl overflow-hidden';
+        var summary = document.createElement('summary');
+        summary.className = 'px-4 py-2.5 cursor-pointer select-none flex items-center justify-between text-sm font-medium text-slate-700 hover:bg-blue-50 transition-colors list-none';
+        summary.innerHTML =
+          '<span><span class="inline-block w-6 h-6 rounded-md bg-blue-100 text-blue-700 text-xs font-bold text-center leading-6 mr-2">' + layout.layout_index + '</span>' + escapeHtml(layout.layout_name) + '</span>' +
+          '<span class="text-xs text-slate-400">' + layout.placeholders.length + ' placeholder' + (layout.placeholders.length !== 1 ? 's' : '') + ' \u25be</span>';
+        wrap.appendChild(summary);
+        if (layout.placeholders.length) {
+          var tw = document.createElement('div'); tw.className = 'px-4 pb-3';
+          var hasDeep = !!dsLayouts[layout.layout_index];
+          var tbl = document.createElement('table'); tbl.className = 'w-full text-xs border-collapse';
+          var headerCols = '<th class="text-left py-1.5 pr-3 text-slate-500 font-semibold w-10">idx</th>' +
+            '<th class="text-left py-1.5 pr-3 text-slate-500 font-semibold">Name</th>' +
+            '<th class="text-left py-1.5 text-slate-500 font-semibold">Type</th>';
+          if (hasDeep) {
+            headerCols += '<th class="text-left py-1.5 pl-2 text-slate-500 font-semibold">Font</th>' +
+              '<th class="text-left py-1.5 pl-2 text-slate-500 font-semibold">Position</th>';
+          }
+          tbl.innerHTML = '<thead><tr class="border-b border-slate-200">' + headerCols + '</tr></thead>';
+          var tbody = document.createElement('tbody');
+          var phMap = dsLayouts[layout.layout_index] || {};
+          layout.placeholders.forEach(function(ph) {
+            var tr = document.createElement('tr'); tr.className = 'border-b border-slate-100 last:border-0';
+            var cells = '<td class="py-1.5 pr-3 text-slate-400">' + ph.idx + '</td>' +
+              '<td class="py-1.5 pr-3 font-mono text-slate-700">' + escapeHtml(ph.name) + '</td>' +
+              '<td class="py-1.5"><span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-xs font-medium">' + escapeHtml(ph.type || ph.ph_type || '') + '</span></td>';
+            if (hasDeep) {
+              var dp = phMap[ph.idx];
+              if (dp && dp.font) {
+                var fc = dp.font.color || '';
+                var colorDot = fc ? '<span class="inline-block w-2.5 h-2.5 rounded-full mr-1 align-middle" style="background:' + escapeHtml(fc) + '"></span>' : '';
+                cells += '<td class="py-1.5 pl-2 text-slate-500">' + colorDot +
+                  escapeHtml((dp.font.name || '?') + ' ' + (dp.font.size || '?') + 'pt') +
+                  (dp.font.bold ? ' <b>B</b>' : '') + '</td>';
+              } else {
+                cells += '<td class="py-1.5 pl-2 text-slate-400">-</td>';
+              }
+              if (dp && dp.pos) {
+                cells += '<td class="py-1.5 pl-2 text-slate-400 font-mono">' +
+                  (dp.pos.left != null ? dp.pos.left.toFixed(1) : '?') + ',' +
+                  (dp.pos.top != null ? dp.pos.top.toFixed(1) : '?') + ' ' +
+                  (dp.pos.width != null ? dp.pos.width.toFixed(1) : '?') + '\u00d7' +
+                  (dp.pos.height != null ? dp.pos.height.toFixed(1) : '?') + '"</td>';
+              } else {
+                cells += '<td class="py-1.5 pl-2 text-slate-400">-</td>';
+              }
+            }
+            tr.innerHTML = cells;
+            tbody.appendChild(tr);
+          });
+          tbl.appendChild(tbody); tw.appendChild(tbl); wrap.appendChild(tw);
+        } else {
+          var empty = document.createElement('p'); empty.className = 'px-4 pb-3 text-xs text-slate-400'; empty.textContent = 'No placeholders defined.'; wrap.appendChild(empty);
+        }
+        container.appendChild(wrap);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Deep Scan Panel ────────────────────────────────────── */
+    function renderDeepScanPanel(ds) {
+      var panel = document.getElementById('deepScanPanel');
+      panel.classList.remove('hidden');
+
+      var profile = ds.master_profile || {};
+      var structure = ds.master_structure || {};
+
+      // Color palette
+      var colorsEl = document.getElementById('dsColors');
+      colorsEl.innerHTML = '<span class="text-xs text-slate-500 mr-1">Colors:</span>';
+      var palette = profile.color_palette || {};
+      Object.keys(palette).forEach(function(key) {
+        var hex = palette[key];
+        colorsEl.innerHTML += '<span class="inline-flex items-center gap-1 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[10px]">' +
+          '<span class="w-3 h-3 rounded-sm border border-slate-200" style="background:' + escapeHtml(hex) + '"></span>' +
+          '<span class="text-slate-500">' + escapeHtml(key) + '</span>' +
+          '<span class="font-mono text-slate-600">' + escapeHtml(hex) + '</span></span>';
+      });
+
+      // Theme colors
+      var themeColors = profile.theme_colors || {};
+      if (Object.keys(themeColors).length) {
+        colorsEl.innerHTML += '<br/><span class="text-xs text-slate-500 mr-1 mt-1 inline-block">Theme:</span>';
+        Object.keys(themeColors).forEach(function(key) {
+          var hex = themeColors[key];
+          colorsEl.innerHTML += '<span class="inline-flex items-center gap-1 bg-white border border-slate-100 rounded px-1.5 py-0.5 text-[10px]">' +
+            '<span class="w-2.5 h-2.5 rounded-sm" style="background:' + escapeHtml(hex) + '"></span>' +
+            '<span class="text-slate-400">' + escapeHtml(key) + '</span></span>';
+        });
+      }
+
+      // Font summary — collect unique fonts across all layouts
+      var fonts = new Set();
+      var allLayouts = (profile.layouts || []).concat(structure.additional_layouts || []);
+      allLayouts.forEach(function(l) {
+        (l.placeholders || []).forEach(function(p) {
+          if (p.font && p.font.name) fonts.add(p.font.name);
+        });
+      });
+      var fontsEl = document.getElementById('dsFonts');
+      fontsEl.innerHTML = '<span class="text-slate-500">Fonts:</span> ' +
+        (fonts.size ? Array.from(fonts).map(function(f) {
+          return '<span class="bg-white border border-slate-200 rounded px-1.5 py-0.5 font-medium">' + escapeHtml(f) + '</span>';
+        }).join(' ') : '<span class="text-slate-400">None detected</span>');
+
+      // Canvas
+      var canvas = profile.canvas_size || {};
+      document.getElementById('dsCanvas').textContent =
+        'Canvas: ' + (canvas.width || '?') + '" \u00d7 ' + (canvas.height || '?') + '"' +
+        '  |  Main layouts: ' + (profile.layouts || []).length +
+        '  |  Additional: ' + (structure.additional_layouts || []).length;
+
+      // Full JSON detail
+      document.getElementById('dsProfileJson').textContent = JSON.stringify(ds, null, 2);
+    }
+
+    function toggleDeepDetail() {
+      deepDetailVisible = !deepDetailVisible;
+      document.getElementById('deepScanDetail').classList.toggle('hidden', !deepDetailVisible);
+      document.getElementById('deepDetailToggleText').textContent = deepDetailVisible ? 'Hide detail' : 'Show detail';
+    }
+
+    /*  Build AI Prompt  */
+    function buildAIPrompt() {
+      var layoutJson = JSON.stringify(layoutData, null, 2);
+      var topic    = (document.getElementById('slideTopic').value   || '').trim();
+      var count    = parseInt(document.getElementById('slideCount').value, 10) || 7;
+      var language = document.getElementById('slideLanguage').value || 'Tiếng Việt';
+
+      if (!topic) {
+        showToast('Vui lòng nhập nội dung / chủ đề trước khi copy prompt.', '\u26a0', 3000);
+        document.getElementById('slideTopic').focus();
+        return null;
+      }
+
+      // Build deep profile section if available
+      var deepProfileSection = '';
+      if (deepScanData && deepScanData.master_profile) {
+        var dp = deepScanData.master_profile;
+        var ds = deepScanData.master_structure || {};
+        var allDsLayouts = (dp.layouts || []).concat(ds.additional_layouts || []);
+        // Compact layout reference for AI
+        var profileRef = allDsLayouts.map(function(l) {
+          var phDescs = (l.placeholders || []).map(function(p) {
+            var font = p.font || {};
+            var desc = 'idx=' + p.idx + ' "' + (p.name || '') + '"';
+            if (font.name) desc += ' font=' + font.name;
+            if (font.size) desc += ' ' + font.size + 'pt';
+            if (font.bold) desc += ' bold';
+            if (font.color) desc += ' color=' + font.color;
+            if (p.pos) desc += ' pos=(' + (p.pos.left||0).toFixed(1) + ',' + (p.pos.top||0).toFixed(1) + ' ' + (p.pos.width||0).toFixed(1) + '\u00d7' + (p.pos.height||0).toFixed(1) + ')';
+            return desc;
+          });
+          return 'Layout[' + l.layout_index + '] "' + l.name + '"' + (l.pptx_layout ? ' (' + l.pptx_layout + ')' : '') + ':\n  ' + phDescs.join('\n  ');
+        }).join('\n');
+
+        deepProfileSection = '\n== MASTER DESIGN PROFILE ==\n' +
+          'Canvas: ' + (dp.canvas_size ? dp.canvas_size.width + '" \u00d7 ' + dp.canvas_size.height + '"' : 'unknown') + '\n' +
+          'Color palette: ' + JSON.stringify(dp.color_palette || {}) + '\n' +
+          'Fixed elements: ' + JSON.stringify(dp.fixed_elements || {}) + '\n\n' +
+          'Layout Details (with font, size, color, position for each placeholder):\n' +
+          profileRef + '\n\n' +
+          'IMPORTANT: Use the exact layout_index values shown above.\n' +
+          'Each placeholder has a fixed position and font in the master — write content to match.\n' +
+          'Title placeholders are typically idx=0. Body/content placeholders are idx=1 or idx=2.\n\n';
+      }
+
+      return 'You are a PowerPoint slide content generator.\n\n' +
+        '== PRESENTATION REQUIREMENTS ==\n' +
+        'Topic / Content   : ' + topic + '\n' +
+        'Number of slides  : ' + count + '\n' +
+        'Slide language    : ' + language + '\n\n' +
+        '== MASTER LAYOUT STRUCTURE ==\n' +
+        'Below is the layout structure extracted from the PowerPoint Master file.\n' +
+        'Each layout has an index, a name, and placeholders (idx, name, type).\n' +
+        layoutJson + '\n\n' +
+        deepProfileSection +
+        '== YOUR TASK ==\n' +
+        'Generate exactly ' + count + ' slides about the topic above.\n' +
+        'All text content MUST be written in: ' + language + '.\n\n' +
+        'Strict rules:\n' +
+        '1. Return ONLY a valid JSON array — no markdown, no explanation, no code fences.\n' +
+        '2. The array must contain exactly ' + count + ' slide objects.\n' +
+        '3. Each slide object must have:\n' +
+        '   - "layout_index": (integer) index of the layout to use\n' +
+        '   - "title": short slide title (string)\n' +
+        '   - "placeholders": array of objects, each with:\n' +
+        '       { "id": <placeholder idx as integer>, "content": <string or string[]>, "type": "text" | "list" }\n' +
+        '4. For bullet-point content use type "list" with content as a string array.\n' +
+        '5. For plain text use type "text" with content as a string.\n' +
+        '6. Choose layouts intelligently (e.g., layout 0 for title slide, others for content).\n\n' +
+        '== EXAMPLE OUTPUT (2 slides) ==\n' +
+        '[\n' +
+        '  {\n' +
+        '    "layout_index": 0,\n' +
+        '    "title": "Tiêu đề bài thuyết trình",\n' +
+        '    "placeholders": [\n' +
+        '      { "id": 0, "content": "Tiêu đề bài thuyết trình", "type": "text" },\n' +
+        '      { "id": 1, "content": "Tên tác giả • Ngày tháng", "type": "text" }\n' +
+        '    ]\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "layout_index": 1,\n' +
+        '    "title": "Nội dung chính",\n' +
+        '    "placeholders": [\n' +
+        '      { "id": 0, "content": "Nội dung chính", "type": "text" },\n' +
+        '      { "id": 1, "content": ["Điểm 1", "Điểm 2", "Điểm 3"], "type": "list" }\n' +
+        '    ]\n' +
+        '  }\n' +
+        ']\n\n' +
+        'Now generate all ' + count + ' slides in ' + language + '. Return ONLY the JSON array.';
+    }
+
+    function copyPrompt() {
+      if (!layoutData) return;
+      var prompt = buildAIPrompt();
+      if (!prompt) return;  // topic was empty — toast already shown
+      var btn = document.getElementById('copyBtnText');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(prompt).then(function() {
+          btn.textContent = 'Copied!';
+          showToast('Prompt copied to clipboard!');
+          setTimeout(function() { btn.textContent = 'Copy Prompt for AI'; }, 2500);
+        });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = prompt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        btn.textContent = 'Copied!';
+        showToast('Prompt copied to clipboard!');
+        setTimeout(function() { btn.textContent = 'Copy Prompt for AI'; }, 2500);
+      }
+    }
+
+    /*  Step 2: Validate  */
+    function validateAndProceed() {
+      var raw    = document.getElementById('aiJsonInput').value.trim();
+      var banner = document.getElementById('jsonValidation');
+      if (!raw) {
+        banner.textContent = '\u26a0  Please paste the AI response before continuing.';
+        banner.className   = 'text-sm rounded-lg px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200';
+        banner.classList.remove('hidden'); return;
+      }
+      var cleaned = raw.replace(/^```[a-z]*\n?/i, '').replace(/```\s*$/, '').trim();
+      try {
+        var parsed = JSON.parse(cleaned);
+        if (!Array.isArray(parsed)) throw new Error('Expected a JSON array.');
+        validatedJson = parsed;
+        banner.textContent = '\u2714  Valid JSON \u2014 ' + parsed.length + ' slide(s) ready.';
+        banner.className   = 'text-sm rounded-lg px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200';
+        banner.classList.remove('hidden');
+        setTimeout(function() { goToStep3(); }, 600);
+      } catch (err) {
+        banner.textContent = '\u2715  Invalid JSON: ' + err.message;
+        banner.className   = 'text-sm rounded-lg px-4 py-2 bg-red-50 text-red-700 border border-red-200';
+        banner.classList.remove('hidden');
+      }
+    }
+
+    /*  Step 3: Generate  */
+    async function generatePptx() {
+      var btn    = document.getElementById('generateBtn');
+      var status = document.getElementById('generateStatus');
+      var dl     = document.getElementById('downloadLink');
+      btn.disabled = true;
+      document.getElementById('generateBtnText').innerHTML = '<span class="spinner"></span>&nbsp;Generating\u2026';
+      status.classList.remove('hidden');
+      status.className   = 'text-sm rounded-lg px-4 py-3 bg-blue-50 text-blue-700 border border-blue-100';
+      status.textContent = 'Sending to server\u2026';
+      dl.classList.add('hidden');
+      try {
+        var payload = { slides: validatedJson };
+        if (useBuiltinProfile) {
+          payload.mode = 'profile';
+        } else {
+          payload.filename = uploadedFilename;
+        }
+        var res = await fetch('/generate', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(payload)
+        });
+        if (res.ok) {
+          var blob  = await res.blob();
+          var url   = URL.createObjectURL(blob);
+          var cd    = res.headers.get('Content-Disposition') || '';
+          var match = cd.match(/filename="?([^"]+)"?/);
+          var name  = match ? match[1] : 'presentation.pptx';
+          dl.href = url; dl.download = name; dl.classList.remove('hidden');
+          status.textContent = '\u2714  PowerPoint generated successfully!';
+          status.className   = 'text-sm rounded-lg px-4 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200';
+          showToast('Done! Click Download to save your file.', '\uD83C\uDF89', 4000);
+        } else {
+          var data = await res.json().catch(function() { return { error: 'Unknown error.' }; });
+          status.textContent = '\u2715  ' + (data.error || 'Generation failed.');
+          status.className   = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+        }
+      } catch (err) {
+        status.textContent = 'Network error: ' + err.message;
+        status.className   = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+      } finally {
+        btn.disabled = false;
+        document.getElementById('generateBtnText').textContent = 'Regenerate';
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       Saved Masters panel
+    ════════════════════════════════════════════════════════════════ */
+    var savedPanelOpen = false;
+
+    /* ════════════════════════════════════════════════════════════════
+       Mode switching (master vs built-in profile)
+    ════════════════════════════════════════════════════════════════ */
+    function setMode(mode) {
+      useBuiltinProfile = (mode === 'profile');
+      var uploadSection  = document.getElementById('uploadSection');
+      var profileInfo    = document.getElementById('profileModeInfo');
+      var btnMaster      = document.getElementById('modeUploadBtn');
+      var btnProfile     = document.getElementById('modeProfileBtn');
+      var activeClass    = 'flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600';
+      var inactiveClass  = 'flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50';
+
+      if (useBuiltinProfile) {
+        uploadSection.classList.add('hidden');
+        profileInfo.classList.remove('hidden');
+        btnMaster.className  = inactiveClass;
+        btnProfile.className = activeClass;
+        initBuiltinMode();
+      } else {
+        uploadSection.classList.remove('hidden');
+        profileInfo.classList.add('hidden');
+        btnMaster.className  = activeClass;
+        btnProfile.className = inactiveClass;
+        // Reset if we switched away from profile
+        if (uploadedFilename === '__profile__') {
+          uploadedFilename = '';
+          layoutData = null;
+          document.getElementById('layoutResult').classList.add('hidden');
+        }
+      }
+    }
+
+    async function initBuiltinMode() {
+      try {
+        if (!builtinLayoutSchema || !Array.isArray(builtinLayoutSchema.layouts)) {
+          var res = await fetch('/layout_schema');
+          if (!res.ok) {
+            var errData = await res.json().catch(function() { return {}; });
+            throw new Error(errData.error || 'HTTP ' + res.status);
+          }
+          var data = await res.json();
+          if (!data.layouts || !Array.isArray(data.layouts)) {
+            throw new Error('Schema không có danh sách layouts hợp lệ.');
+          }
+          builtinLayoutSchema = data;
+        }
+        // Build a layoutData-compatible array for buildAIPrompt
+        var identity = builtinLayoutSchema.template_identity || 'Built-in Template';
+        layoutData = builtinLayoutSchema.layouts.map(function(l) {
+          return {
+            layout_index: l.layout_index,
+            layout_name:  l.name,
+            placeholders: (l.placeholders || []).map(function(p) {
+              return { idx: p.idx, name: p.name, type: p.font ? 'BODY' : 'OBJECT' };
+            })
+          };
+        });
+        // renderLayoutTable expects {filename, total_layouts, layouts:[]}
+        renderLayoutTable({ filename: identity, total_layouts: layoutData.length, layouts: layoutData });
+        document.getElementById('layoutResult').classList.remove('hidden');
+        uploadedFilename = '__profile__';
+      } catch (e) {
+        showToast('Kh\u00f4ng th\u1ec3 t\u1ea3i layout schema: ' + e.message, '\u26a0', 4000);
+      }
+    }
+
+    function toggleSavedPanel() {
+      savedPanelOpen = !savedPanelOpen;
+      var panel   = document.getElementById('savedPanel');
+      var chevron = document.getElementById('savedPanelChevron');
+      if (savedPanelOpen) {
+        panel.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+        loadSavedMasters();
+      } else {
+        panel.classList.add('hidden');
+        chevron.style.transform = '';
+      }
+    }
+
+    async function loadSavedMasters() {
+      var list  = document.getElementById('savedMastersList');
+      var badge = document.getElementById('masterBadge');
+      list.innerHTML = '<p class="px-6 py-4 text-sm text-slate-400">Đang tải\u2026</p>';
+      try {
+        var res  = await fetch('/list_masters');
+        var data = await res.json();
+        var masters = data.masters || [];
+        badge.textContent = masters.length;
+
+        if (masters.length === 0) {
+          list.innerHTML = '<p class="px-6 py-4 text-sm text-slate-400">Chưa có master nào được lưu.</p>';
+          return;
+        }
+
+        list.innerHTML = '';
+        masters.forEach(function(m) {
+          var row = document.createElement('div');
+          row.className = 'flex items-center justify-between px-6 py-3 hover:bg-slate-50 transition-colors';
+
+          var info = document.createElement('div');
+          info.className = 'flex-1 min-w-0';
+
+          var nameEl = document.createElement('p');
+          nameEl.className = 'text-sm font-medium text-slate-800 truncate';
+          nameEl.textContent = m.filename;
+
+          var meta = document.createElement('p');
+          meta.className = 'text-xs text-slate-400 mt-0.5';
+          meta.textContent = m.total_layouts + ' layouts · ' + (m.saved_at ? m.saved_at.replace('T', ' ') : '');
+          if (!m.pptx_exists) {
+            var warn = document.createElement('span');
+            warn.className = 'ml-2 text-amber-500';
+            warn.textContent = '(file PPTX không còn trên server)';
+            meta.appendChild(warn);
+          }
+
+          info.appendChild(nameEl);
+          info.appendChild(meta);
+
+          var btnLoad = document.createElement('button');
+          btnLoad.className = 'ml-3 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0';
+          btnLoad.textContent = 'Tải lại';
+          btnLoad.onclick = function() { loadMaster(m.filename); };
+
+          row.appendChild(info);
+          row.appendChild(btnLoad);
+          list.appendChild(row);
+        });
+      } catch (err) {
+        list.innerHTML = '<p class="px-6 py-4 text-sm text-red-500">Lỗi tải danh sách: ' + escapeHtml(err.message) + '</p>';
+      }
+    }
+
+    async function loadMaster(filename) {
+      try {
+        var res  = await fetch('/load_layout/' + encodeURIComponent(filename));
+        var data = await res.json();
+        if (!res.ok) { showToast(data.error || 'Không tải được layout.', '\u2715', 3000); return; }
+
+        layoutData       = data.layouts;
+        uploadedFilename = data.filename;
+        renderLayoutTable(data);
+        document.getElementById('layoutResult').classList.remove('hidden');
+
+        var s = document.getElementById('uploadStatus');
+        s.textContent = '\u2714  Đã tải layout từ bản lưu: ' + data.filename;
+        s.className   = 'text-sm text-emerald-600';
+        s.classList.remove('hidden');
+
+        // Close saved panel
+        savedPanelOpen = true; toggleSavedPanel();
+        showToast('Đã tải master: ' + filename);
+      } catch (err) {
+        showToast('Lỗi mạng: ' + err.message, '\u2715', 3000);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       Edit Layout Modal
+    ════════════════════════════════════════════════════════════════ */
+    var _originalLayoutSnapshot = null;  // snapshot for "restore" button
+
+    function openEditModal() {
+      if (!layoutData) return;
+      _originalLayoutSnapshot = JSON.parse(JSON.stringify(layoutData));
+      document.getElementById('editModalJson').value = JSON.stringify(layoutData, null, 2);
+      document.getElementById('editModalError').classList.add('hidden');
+      document.getElementById('editModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function closeEditModalOutside(e) {
+      if (e.target === document.getElementById('editModal')) closeEditModal();
+    }
+
+    function resetLayoutFromServer() {
+      if (_originalLayoutSnapshot) {
+        document.getElementById('editModalJson').value = JSON.stringify(_originalLayoutSnapshot, null, 2);
+        document.getElementById('editModalError').classList.add('hidden');
+      }
+    }
+
+    async function saveLayoutEdits() {
+      var raw   = document.getElementById('editModalJson').value.trim();
+      var errEl = document.getElementById('editModalError');
+      var btn   = document.getElementById('saveLayoutBtn');
+      var btnTxt = document.getElementById('saveLayoutBtnText');
+
+      // Validate JSON
+      var parsed;
+      try {
+        parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) throw new Error('Phải là một mảng JSON.');
+      } catch (err) {
+        errEl.textContent = 'JSON không hợp lệ: ' + err.message;
+        errEl.classList.remove('hidden');
+        return;
+      }
+      errEl.classList.add('hidden');
+
+      btn.disabled = true;
+      btnTxt.innerHTML = '<span class="spinner"></span>&nbsp;Đang lưu\u2026';
+
+      try {
+        var res  = await fetch('/update_layout/' + encodeURIComponent(uploadedFilename), {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ layouts: parsed })
+        });
+        var data = await res.json();
+
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Lưu thất bại.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+
+        // Update in-memory state & re-render
+        layoutData = data.layouts;
+        renderLayoutTable(data);
+        closeEditModal();
+        showToast('Layout đã được lưu thành công!', '\u2714');
+        // Refresh badge if panel is open
+        if (savedPanelOpen) loadSavedMasters();
+
+      } catch (err) {
+        errEl.textContent = 'Lỗi mạng: ' + err.message;
+        errEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btnTxt.textContent = 'Lưu thay đổi';
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       Init
+    ════════════════════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('aiJsonInput').addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') validateAndProceed();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeEditModal();
+      });
+      // Pre-load badge count + prefetch layout schema silently
+      fetch('/list_masters').then(function(r) { return r.json(); }).then(function(d) {
+        var n = (d.masters || []).length;
+        document.getElementById('masterBadge').textContent = n;
+      }).catch(function() {});
+      fetch('/layout_schema').then(function(r) { return r.ok ? r.json() : null; }).then(function(d) {
+        if (d && Array.isArray(d.layouts) && d.layouts.length > 0) builtinLayoutSchema = d;
+      }).catch(function() {});
+    });
+  </script>
+</body>
+</html>

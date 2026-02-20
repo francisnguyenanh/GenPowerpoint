@@ -1,0 +1,72 @@
+{
+  "additional_layouts": [
+    {
+      "layout_index": 2,
+      "name": "Section Divider (Chapter)",
+      "pptx_layout": "SECTION_HEADER",
+      "description": "Trang đệm ngăn cách giữa các chương lớn",
+      "placeholders": [
+        {
+          "idx": 0,
+          "name": "Chapter Name",
+          "font": {"name": "Meiryo UI", "size": 32, "bold": true, "color": "#000000", "align": "CENTER"}
+        },
+        {
+          "idx": 1,
+          "name": "Chapter Description",
+          "font": {"name": "Meiryo UI", "size": 18, "bold": false, "color": "#595959", "align": "CENTER"}
+        }
+      ]
+    },
+    {
+      "layout_index": 5,
+      "name": "Title Only / Big Picture",
+      "pptx_layout": "TITLE_ONLY",
+      "description": "Dùng làm slide title-only hoặc chèn sơ đồ/hình ảnh bên dưới",
+      "placeholders": [
+        {
+          "idx": 0,
+          "name": "Header Title",
+          "font": {"name": "Meiryo UI", "size": 20, "bold": true, "color": "#C00000", "align": "LEFT"}
+        }
+      ]
+    },
+    {
+      "layout_index": 6,
+      "name": "Blank",
+      "pptx_layout": "BLANK",
+      "description": "Slide trống, dùng cho hình ảnh hoặc nội dung tùy chỉnh",
+      "placeholders": []
+    },
+    {
+      "layout_index": 7,
+      "name": "Content with Caption",
+      "pptx_layout": "OBJECT_WITH_CAPTION_TEXT",
+      "description": "Nội dung chính bên phải, phần mô tả bên trái",
+      "placeholders": [
+        {
+          "idx": 0,
+          "name": "Caption Title",
+          "font": {"name": "Meiryo UI", "size": 20, "bold": true, "color": "#C00000", "align": "LEFT"}
+        },
+        {
+          "idx": 1,
+          "name": "Main Content",
+          "font": {"name": "Meiryo UI", "size": 14, "bold": false, "color": "#000000", "align": "LEFT"}
+        },
+        {
+          "idx": 2,
+          "name": "Caption Text",
+          "font": {"name": "Meiryo UI", "size": 12, "bold": false, "color": "#595959", "align": "LEFT"}
+        }
+      ]
+    }
+  ],
+  "common_elements": {
+    "red_bar": {
+      "type": "shape",
+      "pos": {"left": 0.4, "top": 0.7, "width": 0.8, "height": 0.05},
+      "color": "#C00000"
+    }
+  }
+}
