@@ -1,0 +1,337 @@
+{
+  "file": "master3",
+  "canvas": {
+    "width_inches": 13.33,
+    "height_inches": 7.5
+  },
+  "theme_colors": {},
+  "theme_fonts": {},
+  "layouts": [
+    {
+      "layout_index": 0,
+      "master_index": 0,
+      "local_layout_index": 0,
+      "layout_name": "Title Slide",
+      "slide_role": "cover",
+      "recommended_position": "first",
+      "use_for": "Trang bìa chính của bài thuyết trình.",
+      "text_density": "title_only",
+      "max_placeholders_to_fill": 2,
+      "content_guidance": "Ghi tên khách hàng và tên dự án. Thường có thêm thông tin ngày tháng và phiên bản.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "CENTER_TITLE",
+          "description": "Tên dự án/Proposal",
+          "content_hint": "Tên khách hàng + Proposal",
+          "max_words": 15
+        },
+        {
+          "idx": 1,
+          "type": "SUBTITLE",
+          "description": "Thông tin phụ",
+          "content_hint": "Ngày tháng và Version",
+          "max_words": 10
+        }
+      ],
+      "example": {
+        "title": "ABC 様向け\nTEMPLATE PROPOSAL",
+        "placeholders": [
+          {
+            "id": 1,
+            "content": "2021年03月19日\nVersion: 1.0",
+            "type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "layout_index": 1,
+      "master_index": 0,
+      "local_layout_index": 1,
+      "layout_name": "Agenda Layout",
+      "slide_role": "agenda",
+      "recommended_position": "early",
+      "use_for": "Liệt kê danh mục các chương trong slide.",
+      "text_density": "normal",
+      "max_placeholders_to_fill": 2,
+      "content_guidance": "Tiêu đề là AGENDA. Nội dung liệt kê từ 5-7 mục lớn có đánh số.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Tiêu đề trang",
+          "content_hint": "AGENDA",
+          "max_words": 5
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Danh sách mục lục",
+          "content_hint": "Danh sách đánh số từ 01 đến 07",
+          "max_words": null
+        }
+      ],
+      "example": {
+        "title": "AGENDA",
+        "placeholders": [
+          {
+            "id": 1,
+            "content": [
+              "01 Executive Summary",
+              "02 Company Introduction",
+              "03 Proposal Summary"
+            ],
+            "type": "list"
+          }
+        ]
+      }
+    },
+    {
+      "layout_index": 2,
+      "master_index": 0,
+      "local_layout_index": 2,
+      "layout_name": "Section Header (Dark)",
+      "slide_role": "section_divider",
+      "recommended_position": "middle",
+      "use_for": "Ngắt chương với nền màu đậm hoặc hình ảnh lớn.",
+      "text_density": "title_only",
+      "max_placeholders_to_fill": 1,
+      "content_guidance": "Chỉ ghi tên chương và số chương lớn. Text thường nằm giữa hoặc lệch phải tùy master.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "CENTER_TITLE",
+          "description": "Tên chương",
+          "content_hint": "Tên chương viết hoa + Số thứ tự",
+          "max_words": 10
+        }
+      ],
+      "example": {
+        "title": "EXECUTIVE SUMMARY\n01",
+        "placeholders": []
+      }
+    },
+    {
+      "layout_index": 3,
+      "master_index": 0,
+      "local_layout_index": 3,
+      "layout_name": "Title and Content",
+      "slide_role": "content",
+      "recommended_position": "middle",
+      "use_for": "Layout nội dung chuẩn mực với tiêu đề và một vùng văn bản.",
+      "text_density": "normal",
+      "max_placeholders_to_fill": 2,
+      "content_guidance": "Tiêu đề nêu rõ ý chính. Body dùng bullet points.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Tiêu đề slide",
+          "content_hint": "Tóm tắt nội dung slide",
+          "max_words": 12
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Vùng nội dung chính",
+          "content_hint": "3-5 bullet points",
+          "max_words": null
+        }
+      ],
+      "example": {
+        "title": "1. Executive Summary",
+        "placeholders": [
+          {
+            "id": 1,
+            "content": [
+              "Giải pháp tối ưu chi phí",
+              "Hệ thống vận hành ổn định"
+            ],
+            "type": "list"
+          }
+        ]
+      }
+    },
+    {
+      "layout_index": 4,
+      "master_index": 0,
+      "local_layout_index": 4,
+      "layout_name": "Company Intro - Info",
+      "slide_role": "content",
+      "recommended_position": "early",
+      "use_for": "Giới thiệu thông tin pháp lý/cơ bản của công ty.",
+      "text_density": "normal",
+      "max_placeholders_to_fill": 2,
+      "content_guidance": "Điền thông tin định danh công ty: Tên, Ngày thành lập, Nhân sự.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Tiêu đề Introduction",
+          "content_hint": "COMPANY INTRODUCTION",
+          "max_words": 5
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Bảng thông tin công ty",
+          "content_hint": "Thông tin chi tiết công ty",
+          "max_words": 100
+        }
+      ],
+      "example": {
+        "title": "COMPANY INTRODUCTION",
+        "placeholders": [
+          {
+            "id": 1,
+            "content": "Company Name: VTI JOINT STOCK COMPANY\nEstablishment: 8/2017",
+            "type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "layout_index": 5,
+      "master_index": 0,
+      "local_layout_index": 5,
+      "layout_name": "Two Content (Comparison)",
+      "slide_role": "content",
+      "recommended_position": "middle",
+      "use_for": "So sánh hai khía cạnh hoặc liệt kê hai cột song song.",
+      "text_density": "normal",
+      "max_placeholders_to_fill": 3,
+      "content_guidance": "Dùng cho các bảng so sánh Current State vs Future State.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Tiêu đề so sánh",
+          "content_hint": "Tên 2 đối tượng so sánh",
+          "max_words": 10
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Nội dung cột trái",
+          "content_hint": "Đặc điểm nhóm 1",
+          "max_words": null
+        },
+        {
+          "idx": 2,
+          "type": "BODY",
+          "description": "Nội dung cột phải",
+          "content_hint": "Đặc điểm nhóm 2",
+          "max_words": null
+        }
+      ],
+      "example": {
+        "title": "So sánh chi phí",
+        "placeholders": [
+          {
+            "id": 1,
+            "content": [
+              "Tốn phí bảo trì",
+              "Khó mở rộng"
+            ],
+            "type": "list"
+          },
+          {
+            "id": 2,
+            "content": [
+              "Tối ưu chi phí",
+              "Tự động scale"
+            ],
+            "type": "list"
+          }
+        ]
+      }
+    },
+    {
+      "layout_index": 6,
+      "master_index": 0,
+      "local_layout_index": 6,
+      "layout_name": "Contract/Legal Detail",
+      "slide_role": "content",
+      "recommended_position": "late",
+      "use_for": "Trình bày chi tiết về loại hợp đồng, chi phí và phạm vi.",
+      "text_density": "normal",
+      "max_placeholders_to_fill": 2,
+      "content_guidance": "Tập trung vào các điều khoản Contract Type, Scope, Cost.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Tiêu đề hợp đồng",
+          "content_hint": "CONTRACT / SCOPE",
+          "max_words": 10
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Chi tiết điều khoản",
+          "content_hint": "Các mục 1, 2, 3 về hợp đồng",
+          "max_words": null
+        }
+      ],
+      "example": {
+        "title": "1. Contract type and Scope",
+        "placeholders": [
+          {
+            "id": 1,
+            "content": [
+              "Fixed Price",
+              "Phạm vi: Phát triển & Kiểm thử"
+            ],
+            "type": "list"
+          }
+        ]
+      }
+    },
+    {
+      "layout_index": 7,
+      "master_index": 0,
+      "local_layout_index": 7,
+      "layout_name": "Blank with Background",
+      "slide_role": "utility",
+      "recommended_position": "any",
+      "use_for": "Trang trống có nền để chèn hình ảnh minh họa lớn hoặc sơ đồ tự do.",
+      "text_density": "title_only",
+      "max_placeholders_to_fill": 0,
+      "content_guidance": "Không điền text. Layout này dùng để chèn thủ công các sơ đồ phức tạp.",
+      "placeholders": [],
+      "example": {
+        "title": "",
+        "placeholders": []
+      }
+    },
+    {
+      "layout_index": 8,
+      "master_index": 0,
+      "local_layout_index": 8,
+      "layout_name": "Closing Slide",
+      "slide_role": "closing",
+      "recommended_position": "last",
+      "use_for": "Kết thúc bài thuyết trình.",
+      "text_density": "title_only",
+      "max_placeholders_to_fill": 1,
+      "content_guidance": "Lời cảm ơn cuối cùng.",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "CENTER_TITLE",
+          "description": "Lời chào kết",
+          "content_hint": "THANK YOU",
+          "max_words": 5
+        }
+      ],
+      "example": {
+        "title": "THANK YOU!",
+        "placeholders": []
+      }
+    }
+  ],
+  "filename": "master3.pptx",
+  "saved_at": "2026-02-21T11:56:38",
+  "schema_source": "manual"
+}

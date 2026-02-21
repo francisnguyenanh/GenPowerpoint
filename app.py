@@ -1,14 +1,15 @@
 import copy
 import io
 import os
+import re
 import json
+import shutil
 import datetime
 from lxml import etree
 from flask import Flask, request, jsonify, render_template, send_file
 from werkzeug.utils import secure_filename
 from pptx import Presentation
 from pptx.oxml.ns import qn
-from deep_scanner import deep_scan
 
 app = Flask(__name__)
 
@@ -167,8 +168,9 @@ def update_schema(filename):
 @app.route("/upload_master", methods=["POST"])
 def upload_master():
     """
-    Accept a .pptx file upload, deep-scan its slide layouts, save a single
-    {stem}.schema.json, and return the schema as JSON.
+    Accept a .pptx file upload and save it.  No scanning is performed —
+    schema must be imported separately via /import_schema or come from a
+    built-in profile.  Returns any pre-existing schema sidecar if present.
     """
     if "file" not in request.files:
         return jsonify({"error": "No file field in request."}), 400
@@ -182,27 +184,291 @@ def upload_master():
     save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     file.save(save_path)
 
-    try:
-        result = deep_scan(save_path)
-        schema = result["layout_schema"]
-        schema["filename"] = filename
-        schema["saved_at"] = datetime.datetime.now().isoformat(timespec="seconds")
-        with open(_schema_json_path(filename), "w", encoding="utf-8") as f:
-            json.dump(schema, f, ensure_ascii=False, indent=2)
-        return jsonify(schema)
-    except Exception as exc:
-        return jsonify({"error": f"Failed to scan file: {exc}"}), 500
+    # Return existing schema sidecar if available
+    schema_path = _schema_json_path(filename)
+    if os.path.isfile(schema_path):
+        try:
+            with open(schema_path, "r", encoding="utf-8") as f:
+                schema = json.load(f)
+            return jsonify({
+                "filename":      filename,
+                "schema_source": schema.get("schema_source", "imported"),
+                "total_layouts": len(schema.get("layouts", [])),
+                "layouts":       schema.get("layouts", []),
+            })
+        except Exception:
+            pass
+
+    return jsonify({
+        "filename":      filename,
+        "schema_source": None,
+        "total_layouts": 0,
+        "layouts":       [],
+    })
 
 
-# ── /layout_schema ───────────────────────────────────────────────────────────
-@app.route("/layout_schema", methods=["GET"])
-def layout_schema():
-    """Return the layout schema for the built-in master_slide.pptx."""
+# ── /import_schema ───────────────────────────────────────────────────────────
+@app.route("/import_schema", methods=["POST"])
+def import_schema():
+    """
+    Accept a manually crafted schema JSON (from an external AI) and save it
+    directly without any deep_scan or merging.
+
+    Expected body:
+    {
+      "filename": "master1.pptx",   // must already be uploaded to uploads/
+      "schema": { ...layout schema from AI... }
+    }
+    """
+    body = request.get_json(silent=True)
+    if not body:
+        return jsonify({"error": "Request body must be JSON."}), 400
+
+    filename = secure_filename(body.get("filename", ""))
+    if not filename:
+        return jsonify({"error": "'filename' is required."}), 400
+
+    pptx_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    if not os.path.isfile(pptx_path):
+        return jsonify({"error": f"File '{filename}' not found. Upload it first."}), 404
+
+    ai_schema = body.get("schema")
+    if not ai_schema or "layouts" not in ai_schema:
+        return jsonify({"error": "'schema' must contain a 'layouts' array."}), 400
+
+    # Save AI schema as-is, only stamping metadata
+    saved = dict(ai_schema)
+    saved["filename"]      = filename
+    saved["saved_at"]      = datetime.datetime.now().isoformat(timespec="seconds")
+    saved["schema_source"] = "manual"
+
+    schema_path = _schema_json_path(filename)
+    with open(schema_path, "w", encoding="utf-8") as f:
+        json.dump(saved, f, ensure_ascii=False, indent=2)
+
+    return jsonify(saved)
+
+
+# ── /export_layout_previews/<filename> ───────────────────────────────────────
+@app.route("/export_layout_previews/<path:filename>", methods=["GET"])
+def export_layout_previews(filename):
+    """
+    Generate a preview PPTX where each slide = one layout, labeled with
+    layout_index, layout_name, and text_density. Returns the file for download.
+    The user can open it in PowerPoint/Google Slides and screenshot layouts
+    to send to an AI for manual schema generation.
+    """
+    from pptx.util import Inches, Pt
+    from pptx.dml.color import RGBColor
+
+    safe_name = secure_filename(filename)
+    pptx_path = os.path.join(app.config["UPLOAD_FOLDER"], safe_name)
+    if not os.path.isfile(pptx_path):
+        return jsonify({"error": f"File '{filename}' not found."}), 404
+
     try:
-        result = deep_scan(MASTER_SLIDE_PATH)
-        return jsonify(result["layout_schema"])
+        schema_path = _schema_json_path(safe_name)
+        if not os.path.isfile(schema_path):
+            return jsonify({"error": f"No schema found for '{filename}'. Import a schema first."}), 404
+        with open(schema_path, "r", encoding="utf-8") as f:
+            schema = json.load(f)
+        preview_prs = Presentation(pptx_path)
+
+        for lo in schema["layouts"]:
+            layout = _resolve_layout_from_schema(preview_prs, schema["layouts"], lo["layout_index"])
+            slide = preview_prs.slides.add_slide(layout)
+
+            # Red label: layout_index + name + text_density
+            box = slide.shapes.add_textbox(
+                Inches(0.1), Inches(0.05), Inches(8), Inches(0.35)
+            )
+            tf = box.text_frame
+            density = lo.get("text_density", "?")
+            tf.text = (
+                f"[{lo['layout_index']}] {lo['layout_name']}"
+                f"  |  text_density={density}"
+                f"  |  usable={lo.get('usable', '?')}"
+            )
+            run = tf.paragraphs[0].runs[0]
+            run.font.size = Pt(10)
+            run.font.bold = True
+            run.font.color.rgb = RGBColor(0xFF, 0x00, 0x00)
+
+        buf = io.BytesIO()
+        preview_prs.save(buf)
+        buf.seek(0)
+
+        stem = os.path.splitext(safe_name)[0]
+        return send_file(
+            buf,
+            as_attachment=True,
+            download_name=f"{stem}_layout_previews.pptx",
+            mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        )
     except Exception as exc:
         return jsonify({"error": str(exc)}), 500
+
+
+# ── /schema_prompt/<filename> ─────────────────────────────────────────────────
+@app.route("/schema_prompt/<path:filename>", methods=["GET"])
+def schema_prompt(filename):
+    """
+    Return a ready-to-use prompt for an external AI to generate a slide outline.
+
+    Query params:
+      topic:    presentation topic (required)
+      slides:   number of slides (default 10)
+      language: output language (default "Japanese")
+    """
+    safe_name = secure_filename(filename)
+    fpath = _schema_json_path(safe_name)
+    if not os.path.isfile(fpath):
+        return jsonify({"error": f"No schema found for '{filename}'."}), 404
+
+    with open(fpath, "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    topic    = request.args.get("topic", "")
+    n_slides = request.args.get("slides", "10")
+    language = request.args.get("language", "Japanese")
+
+    # Build layout reference block
+    layout_lines = []
+    for lo in schema.get("layouts", []):
+        phs = ", ".join(
+            f"idx={p['idx']}({p['type']}): {p.get('content_hint', p.get('description', ''))}"
+            for p in lo.get("placeholders", [])
+        )
+        line = (
+            f"  layout_index={lo['layout_index']} | {lo['layout_name']}\n"
+            f"    use_for: {lo.get('use_for', '')}\n"
+            f"    text_density: {lo.get('text_density', 'normal')}\n"
+            f"    guidance: {lo.get('content_guidance', 'Fill placeholders appropriately.')}\n"
+            f"    placeholders: [{phs}]"
+        )
+        layout_lines.append(line)
+
+    layouts_block = "\n\n".join(layout_lines)
+
+    prompt = f"""You are generating a PowerPoint presentation outline.
+
+TOPIC: {topic if topic else '<user will specify>'}
+NUMBER OF SLIDES: {n_slides}
+LANGUAGE: {language}
+
+AVAILABLE LAYOUTS:
+{layouts_block}
+
+INSTRUCTIONS:
+1. Choose the most appropriate layout_index for each slide based on "use_for".
+2. Follow the "guidance" field exactly — it tells you how much text to write and what style to use.
+3. Respect "text_density":
+   - title_only: fill ONLY idx=0 (title). Leave all body placeholders empty or omit them.
+   - minimal_text: title + max 2-3 very short bullets (each under 10 words).
+   - normal: fill all placeholders with appropriate content.
+4. Write all content in {language}.
+5. Return ONLY valid JSON. No explanation. No markdown code blocks.
+
+OUTPUT FORMAT (return exactly this structure):
+{{
+  "presentation_name": "<title>",
+  "slides": [
+    {{
+      "layout_index": <int>,
+      "title": "<title text>",
+      "placeholders": [
+        {{ "id": <idx>, "content": "<text or array of bullets>", "type": "text|list" }}
+      ]
+    }}
+  ]
+}}
+
+For "type": use "list" when content is an array of bullet points, "text" otherwise.
+For title_only layouts: placeholders array should be empty [].
+For minimal_text layouts: placeholders array has at most 1 item with max 3 bullets.
+
+Generate the presentation outline now."""
+
+    return jsonify({"prompt": prompt, "schema_source": schema.get("schema_source", "auto")})
+
+
+# ── /save_as_builtin ─────────────────────────────────────────────────────
+@app.route("/save_as_builtin", methods=["POST"])
+def save_as_builtin():
+    """
+    Save an uploaded PPTX + its schema as a built-in template.
+
+    Expected body:
+    {
+      "filename": "master1.pptx",   // already in uploads/
+      "builtin_id": "my-template",   // slug for the template id (auto-generated if omitted)
+      "builtin_name": "My Template",  // human-readable name
+      "schema": { ...merged schema... }  // optional; if omitted loads from .schema.json
+    }
+    """
+    body = request.get_json(silent=True)
+    if not body:
+        return jsonify({"error": "Request body must be JSON."}), 400
+
+    filename = secure_filename(body.get("filename", ""))
+    if not filename:
+        return jsonify({"error": "'filename' is required."}), 400
+
+    src_pptx = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    if not os.path.isfile(src_pptx):
+        return jsonify({"error": f"File '{filename}' not found in uploads/."}), 404
+
+    # Resolve or create builtin_id
+    raw_id = (body.get("builtin_id") or "").strip()
+    if not raw_id:
+        stem = os.path.splitext(filename)[0]
+        raw_id = re.sub(r"[^a-zA-Z0-9_-]", "-", stem).lower()
+    builtin_id   = secure_filename(raw_id)
+    builtin_name = (body.get("builtin_name") or builtin_id).strip() or builtin_id
+
+    # Get schema (from body or from saved .schema.json)
+    schema = body.get("schema")
+    if not schema:
+        schema_path = _schema_json_path(filename)
+        if not os.path.isfile(schema_path):
+            return jsonify({"error": "No schema found. Run a scan or import first."}), 400
+        with open(schema_path, "r", encoding="utf-8") as f:
+            schema = json.load(f)
+
+    # Ensure target directories exist
+    os.makedirs(BUILTIN_MASTER_DIR, exist_ok=True)
+    os.makedirs(BUILTIN_PROFILES_DIR, exist_ok=True)
+
+    # Copy PPTX to master_slide/
+    dst_pptx = os.path.join(BUILTIN_MASTER_DIR, filename)
+    shutil.copy2(src_pptx, dst_pptx)
+
+    # Build profile JSON
+    profile = {
+        "id":            builtin_id,
+        "name":          builtin_name,
+        "pptx":          filename,
+        "total_layouts": len(schema.get("layouts", [])),
+        "canvas_size":   schema.get("canvas"),
+        "theme_colors":  schema.get("theme_colors", {}),
+        "theme_fonts":   schema.get("theme_fonts", {}),
+        "color_palette": {},
+        "layouts":       schema.get("layouts", []),
+        "schema_source": schema.get("schema_source", "auto"),
+        "saved_at":      datetime.datetime.now().isoformat(timespec="seconds"),
+    }
+
+    profile_path = os.path.join(BUILTIN_PROFILES_DIR, f"{builtin_id}.json")
+    with open(profile_path, "w", encoding="utf-8") as f:
+        json.dump(profile, f, ensure_ascii=False, indent=2)
+
+    return jsonify({
+        "ok":          True,
+        "builtin_id":  builtin_id,
+        "builtin_name": builtin_name,
+        "pptx":        filename,
+        "profile_path": profile_path,
+    })
 
 
 # ── XML-safe placeholder helpers ─────────────────────────────────────────────

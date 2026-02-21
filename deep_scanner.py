@@ -56,6 +56,73 @@ def _emu_to_in(emu) -> float | None:
     return round(int(emu) / 914400, 4)
 
 
+def _get_bg_image_blob(layout, master, slide_w: int, slide_h: int) -> bytes | None:
+    """
+    Find the full-screen background image blob for a layout.
+    Checks layout shapes first, then master shapes.
+    Returns raw image bytes or None if no background image found.
+    """
+    from pptx.enum.shapes import MSO_SHAPE_TYPE
+
+    def is_fullscreen(shape) -> bool:
+        try:
+            if shape.shape_type != MSO_SHAPE_TYPE.PICTURE:
+                return False
+            left  = shape.left  or 0
+            top   = shape.top   or 0
+            w     = shape.width  or 0
+            h     = shape.height or 0
+            tol = 0.05
+            return (
+                left / slide_w < tol and
+                top  / slide_h < tol and
+                w    / slide_w > 1 - tol and
+                h    / slide_h > 1 - tol
+            )
+        except Exception:
+            return False
+
+    for shape in layout.shapes:
+        if not shape.is_placeholder and is_fullscreen(shape):
+            try:
+                return shape.image.blob
+            except Exception:
+                pass
+
+    for shape in master.shapes:
+        if not shape.is_placeholder and is_fullscreen(shape):
+            try:
+                return shape.image.blob
+            except Exception:
+                pass
+
+    return None
+
+
+def _bg_text_density(layout, master, slide_w: int, slide_h: int) -> str:
+    """
+    Analyze background image brightness and return a text density hint:
+      "title_only"   — dark background (brightness < 80)
+      "minimal_text" — medium background (80 ≤ brightness < 160)
+      "normal"       — light/no background (brightness ≥ 160)
+    """
+    blob = _get_bg_image_blob(layout, master, slide_w, slide_h)
+    if blob is None:
+        return "normal"
+    try:
+        import io as _io
+        from PIL import Image
+        img = Image.open(_io.BytesIO(blob)).convert("L")
+        img_small = img.resize((50, 50))
+        pixels = list(img_small.tobytes())
+        brightness = sum(pixels) / len(pixels)
+        if brightness < 80:
+            return "title_only"
+        if brightness < 160:
+            return "minimal_text"
+        return "normal"
+    except Exception:
+        return "normal"
 
 
 def _extract_theme_colors(prs) -> dict[str, str]:
@@ -297,6 +364,8 @@ def deep_scan(pptx_path: str) -> dict:
         "width_inches":  round(prs.slide_width / 914400, 2),
         "height_inches": round(prs.slide_height / 914400, 2),
     }
+    slide_w = prs.slide_width
+    slide_h = prs.slide_height
 
     theme_colors = _extract_theme_colors(prs)
     theme_fonts = _extract_theme_fonts(prs)
@@ -324,6 +393,7 @@ def deep_scan(pptx_path: str) -> dict:
                 "local_layout_index": li,
                 "layout_name":        layout.name,
                 "use_for":            _layout_use_for(layout.name),
+                "text_density":       _bg_text_density(layout, master, slide_w, slide_h),
                 "usable":             len(content_phs) > 0,
                 "placeholders":       content_phs,
             })

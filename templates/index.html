@@ -86,18 +86,14 @@
       <!-- Mode toggle -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Ch&#7871; &#273;&#7897; t&#7841;o slide</p>
-        <div class="flex gap-2">
-          <button id="modeUploadBtn" onclick="setMode('master')"
-                  class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600">
-            &#128194; Upload PPTX
-          </button>
+        <div class="grid grid-cols-2 gap-2">
           <button id="modeBuiltinBtn" onclick="setMode('builtin')"
-                  class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
+                  class="py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
             &#127912; Master c&oacute; s&#7861;n
           </button>
-          <button id="modeProfileBtn" onclick="setMode('profile')"
-                  class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
-            &#10024; Profile
+          <button id="modeManualBtn" onclick="setMode('manual')"
+                  class="py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
+            &#129302; Import Schema AI
           </button>
         </div>
         <div id="profileModeInfo" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700">
@@ -113,6 +109,87 @@
             <p class="text-sm text-slate-400 col-span-3">&#8987; Đang tải danh sách master…</p>
           </div>
           <p id="builtinSelectStatus" class="text-xs text-slate-400 hidden"></p>
+        </div>
+      </div>
+
+      <!-- Manual Schema Import section -->
+      <div id="manualSection" class="hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-4">
+          <h2 class="text-base font-semibold text-slate-700">&#129302; Import Schema t&#7915; AI</h2>
+          <p class="text-xs text-slate-500">Upload file PPTX, sau đó dán schema JSON do AI (Claude, GPT…) phân tích thủ công vào ô bên dưới.</p>
+
+          <!-- PPTX upload -->
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 1 &mdash; Upload file PPTX</label>
+            <div id="manualDropZone"
+                 class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer transition-colors hover:border-blue-400 hover:bg-blue-50"
+                 onclick="document.getElementById('manualPptxFile').click()"
+                 ondragover="handleDragOver2(event)"
+                 ondragleave="handleDragLeave2()"
+                 ondrop="handleDrop2(event)">
+              <p class="text-slate-600 font-medium text-sm">Drop file <span class="text-blue-600">.pptx</span> ho&#7863;c click &#273;&#7875; ch&#7885;n</p>
+              <input type="file" id="manualPptxFile" accept=".pptx" class="hidden" onchange="handleManualFileSelect(event)" />
+            </div>
+            <div id="manualFilePill" class="hidden items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 mt-2">
+              <svg class="w-4 h-4 text-blue-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span id="manualFileName" class="text-sm text-blue-700 font-medium truncate flex-1"></span>
+              <button onclick="resetManualFile()" class="text-slate-400 hover:text-red-500 text-xs bg-transparent border-0 cursor-pointer p-0">&#x2715;</button>
+            </div>
+            <button id="manualUploadBtn" onclick="uploadManualPptx()"
+                    class="mt-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                    disabled>
+              <span id="manualUploadBtnText">Upload PPTX</span>
+            </button>
+            <p id="manualUploadStatus" class="hidden text-xs mt-1"></p>
+          </div>
+
+          <!-- Schema JSON textarea -->
+          <div id="manualSchemaArea" class="hidden">
+            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 2 &mdash; Dán Schema JSON từ AI</label>
+            <p class="text-xs text-slate-400 mb-2">Dùng <strong>Claude / ChatGPT</strong> để phân tích file PPTX và xuất ra định dạng schema JSON (có <code class="bg-slate-100 px-1 rounded">content_guidance</code>, <code class="bg-slate-100 px-1 rounded">max_words</code>…).</p>
+            <textarea id="manualSchemaInput" rows="10"
+                      placeholder='{
+  &quot;layouts&quot;: [
+    {
+      &quot;layout_index&quot;: 0,
+      &quot;layout_name&quot;: &quot;Title Slide&quot;,
+      &quot;use_for&quot;: &quot;Opening slide&quot;,
+      &quot;content_guidance&quot;: &quot;Bold title, subtitle with date&quot;,
+      &quot;placeholders&quot;: [
+        { &quot;idx&quot;: 0, &quot;type&quot;: &quot;CENTER_TITLE&quot;, &quot;description&quot;: &quot;Main title&quot; }
+      ]
+    }
+  ]
+}'
+                      class="w-full border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
+
+            <!-- Save as built-in checkbox -->
+            <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="manualSaveBuiltin" onchange="toggleBuiltinFields()" class="w-4 h-4 accent-amber-500" />
+                <span class="text-sm font-semibold text-amber-800">&#128190; Lưu vào thư viện template (built-in)</span>
+              </label>
+              <p class="text-xs text-amber-700">File PPTX + schema sẽ được sao chép vào thư mục <code class="bg-amber-100 px-1 rounded">master_slide/</code> vào xuất hiện trong mục “Master có sẵn”.</p>
+              <div id="builtinFields" class="hidden space-y-2 pt-1">
+                <div>
+                  <label class="block text-xs font-medium text-slate-500 mb-1">Tên template <span class="text-red-400">*</span></label>
+                  <input id="builtinName" type="text" placeholder="Ví dụ: VTI Corporate Blue"
+                         class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-500 mb-1">ID (slug, tự động nếu bỏ trống)</label>
+                  <input id="builtinId" type="text" placeholder="Ví dụ: vti-corporate-blue"
+                         class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono" />
+                </div>
+              </div>
+            </div>
+
+            <button id="manualImportBtn" onclick="importManualSchema()"
+                    class="mt-3 w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+              <span id="manualImportBtnText">&#129302; Import Schema</span>
+            </button>
+            <p id="manualImportStatus" class="hidden text-xs mt-1"></p>
+          </div>
         </div>
       </div>
 
@@ -146,7 +223,7 @@
         <button id="uploadBtn" onclick="uploadFile()"
                 class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
                 disabled>
-          <span id="uploadBtnText">Scan Layouts</span>
+          <span id="uploadBtnText">Upload PPTX</span>
         </button>
         <p id="uploadStatus" class="text-sm text-slate-400 hidden"></p>
       </div>
@@ -174,29 +251,6 @@
           </div>
         </div>
         <div id="layoutAccordion" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
-
-        <!-- Deep Scan Profile Panel -->
-        <div id="deepScanPanel" class="hidden border border-indigo-100 bg-indigo-50/50 rounded-xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="text-sm font-semibold text-indigo-700">&#128270; Deep Scan Profile</h4>
-            <button onclick="toggleDeepDetail()" class="text-xs text-indigo-500 hover:text-indigo-700 transition-colors">
-              <span id="deepDetailToggleText">Show detail</span>
-            </button>
-          </div>
-          <div id="deepScanSummary" class="space-y-2">
-            <!-- Color palette -->
-            <div id="dsColors" class="flex flex-wrap gap-1.5 items-center">
-              <span class="text-xs text-slate-500 mr-1">Colors:</span>
-            </div>
-            <!-- Font summary -->
-            <div id="dsFonts" class="text-xs text-slate-600"></div>
-            <!-- Canvas -->
-            <div id="dsCanvas" class="text-xs text-slate-500"></div>
-          </div>
-          <div id="deepScanDetail" class="hidden space-y-2 max-h-64 overflow-y-auto">
-            <pre id="dsProfileJson" class="text-[11px] bg-white border border-indigo-100 rounded-lg p-3 overflow-x-auto whitespace-pre-wrap text-slate-600"></pre>
-          </div>
-        </div>
 
         <!-- Presentation details -->
         <div class="border-t border-slate-100 pt-4 space-y-3">
@@ -379,10 +433,9 @@
     let uploadedFilename = "";
     let validatedJson = null;
     let useBuiltinProfile = false;
-    let selectedBuiltinId = null;   // id of chosen built-in master
+    let selectedBuiltinId = null;
     let builtinLayoutSchema = null;
-    let deepScanData = null;
-    let deepDetailVisible = false;
+    let manualUploadedFilename = "";  // pptx uploaded in manual mode
 
     /*  Step navigation  */
     function showStep(step) {
@@ -487,22 +540,19 @@
         if (!res.ok) { setUploadError(data.error || 'Upload failed.'); return; }
         layoutData       = data.layouts;
         uploadedFilename = data.filename;
-        renderLayoutTable(data);
-        document.getElementById('layoutResult').classList.remove('hidden');
-        status.textContent = '\u2714  ' + data.total_layouts + ' layout(s) loaded successfully.';
-        status.className   = 'text-sm text-emerald-600';
-
-        // Show deep scan profile if available
-        if (data.deep_scan) {
-          renderDeepScanPanel(data.deep_scan);
-          // Also store deep scan for the AI prompt
-          deepScanData = data.deep_scan;
+        if (data.layouts && data.layouts.length > 0) {
+          renderLayoutTable(data);
+          document.getElementById('layoutResult').classList.remove('hidden');
+          status.textContent = '\u2714  ' + data.total_layouts + ' layout(s) loaded.';
+        } else {
+          status.textContent = '\u2714  File uploaded. No schema yet — use “Import Schema AI” to add layout mapping.';
         }
+        status.className   = 'text-sm text-emerald-600';
       } catch (err) {
         setUploadError('Network error: ' + err.message);
       } finally {
         btn.disabled = false;
-        document.getElementById('uploadBtnText').textContent = 'Scan Layouts';
+        document.getElementById('uploadBtnText').textContent = 'Upload PPTX';
       }
     }
     function setUploadError(msg) {
@@ -516,21 +566,6 @@
       var container = document.getElementById('layoutAccordion');
       container.innerHTML = '';
 
-      // Build a ph details lookup from deep scan if available
-      var dsLayouts = {};
-      if (deepScanData && deepScanData.master_profile) {
-        (deepScanData.master_profile.layouts || []).forEach(function(l) {
-          var phMap = {};
-          (l.placeholders || []).forEach(function(p) { phMap[p.idx] = p; });
-          dsLayouts[l.layout_index] = phMap;
-        });
-        (deepScanData.master_structure && deepScanData.master_structure.additional_layouts || []).forEach(function(l) {
-          var phMap = {};
-          (l.placeholders || []).forEach(function(p) { phMap[p.idx] = p; });
-          dsLayouts[l.layout_index] = phMap;
-        });
-      }
-
       data.layouts.forEach(function(layout) {
         var wrap = document.createElement('details');
         wrap.className = 'bg-slate-50 border border-slate-200 rounded-xl overflow-hidden';
@@ -542,44 +577,17 @@
         wrap.appendChild(summary);
         if (layout.placeholders.length) {
           var tw = document.createElement('div'); tw.className = 'px-4 pb-3';
-          var hasDeep = !!dsLayouts[layout.layout_index];
           var tbl = document.createElement('table'); tbl.className = 'w-full text-xs border-collapse';
           var headerCols = '<th class="text-left py-1.5 pr-3 text-slate-500 font-semibold w-10">idx</th>' +
             '<th class="text-left py-1.5 pr-3 text-slate-500 font-semibold">Name</th>' +
             '<th class="text-left py-1.5 text-slate-500 font-semibold">Type</th>';
-          if (hasDeep) {
-            headerCols += '<th class="text-left py-1.5 pl-2 text-slate-500 font-semibold">Font</th>' +
-              '<th class="text-left py-1.5 pl-2 text-slate-500 font-semibold">Position</th>';
-          }
           tbl.innerHTML = '<thead><tr class="border-b border-slate-200">' + headerCols + '</tr></thead>';
           var tbody = document.createElement('tbody');
-          var phMap = dsLayouts[layout.layout_index] || {};
           layout.placeholders.forEach(function(ph) {
             var tr = document.createElement('tr'); tr.className = 'border-b border-slate-100 last:border-0';
             var cells = '<td class="py-1.5 pr-3 text-slate-400">' + ph.idx + '</td>' +
               '<td class="py-1.5 pr-3 font-mono text-slate-700">' + escapeHtml(ph.name) + '</td>' +
               '<td class="py-1.5"><span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-xs font-medium">' + escapeHtml(ph.type || ph.ph_type || '') + '</span></td>';
-            if (hasDeep) {
-              var dp = phMap[ph.idx];
-              if (dp && dp.font) {
-                var fc = dp.font.color || '';
-                var colorDot = fc ? '<span class="inline-block w-2.5 h-2.5 rounded-full mr-1 align-middle" style="background:' + escapeHtml(fc) + '"></span>' : '';
-                cells += '<td class="py-1.5 pl-2 text-slate-500">' + colorDot +
-                  escapeHtml((dp.font.name || '?') + ' ' + (dp.font.size || '?') + 'pt') +
-                  (dp.font.bold ? ' <b>B</b>' : '') + '</td>';
-              } else {
-                cells += '<td class="py-1.5 pl-2 text-slate-400">-</td>';
-              }
-              if (dp && dp.pos) {
-                cells += '<td class="py-1.5 pl-2 text-slate-400 font-mono">' +
-                  (dp.pos.left != null ? dp.pos.left.toFixed(1) : '?') + ',' +
-                  (dp.pos.top != null ? dp.pos.top.toFixed(1) : '?') + ' ' +
-                  (dp.pos.width != null ? dp.pos.width.toFixed(1) : '?') + '\u00d7' +
-                  (dp.pos.height != null ? dp.pos.height.toFixed(1) : '?') + '"</td>';
-              } else {
-                cells += '<td class="py-1.5 pl-2 text-slate-400">-</td>';
-              }
-            }
             tr.innerHTML = cells;
             tbody.appendChild(tr);
           });
@@ -595,69 +603,6 @@
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    /* ── Deep Scan Panel ────────────────────────────────────── */
-    function renderDeepScanPanel(ds) {
-      var panel = document.getElementById('deepScanPanel');
-      panel.classList.remove('hidden');
-
-      var profile = ds.master_profile || {};
-      var structure = ds.master_structure || {};
-
-      // Color palette
-      var colorsEl = document.getElementById('dsColors');
-      colorsEl.innerHTML = '<span class="text-xs text-slate-500 mr-1">Colors:</span>';
-      var palette = profile.color_palette || {};
-      Object.keys(palette).forEach(function(key) {
-        var hex = palette[key];
-        colorsEl.innerHTML += '<span class="inline-flex items-center gap-1 bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[10px]">' +
-          '<span class="w-3 h-3 rounded-sm border border-slate-200" style="background:' + escapeHtml(hex) + '"></span>' +
-          '<span class="text-slate-500">' + escapeHtml(key) + '</span>' +
-          '<span class="font-mono text-slate-600">' + escapeHtml(hex) + '</span></span>';
-      });
-
-      // Theme colors
-      var themeColors = profile.theme_colors || {};
-      if (Object.keys(themeColors).length) {
-        colorsEl.innerHTML += '<br/><span class="text-xs text-slate-500 mr-1 mt-1 inline-block">Theme:</span>';
-        Object.keys(themeColors).forEach(function(key) {
-          var hex = themeColors[key];
-          colorsEl.innerHTML += '<span class="inline-flex items-center gap-1 bg-white border border-slate-100 rounded px-1.5 py-0.5 text-[10px]">' +
-            '<span class="w-2.5 h-2.5 rounded-sm" style="background:' + escapeHtml(hex) + '"></span>' +
-            '<span class="text-slate-400">' + escapeHtml(key) + '</span></span>';
-        });
-      }
-
-      // Font summary — collect unique fonts across all layouts
-      var fonts = new Set();
-      var allLayouts = (profile.layouts || []).concat(structure.additional_layouts || []);
-      allLayouts.forEach(function(l) {
-        (l.placeholders || []).forEach(function(p) {
-          if (p.font && p.font.name) fonts.add(p.font.name);
-        });
-      });
-      var fontsEl = document.getElementById('dsFonts');
-      fontsEl.innerHTML = '<span class="text-slate-500">Fonts:</span> ' +
-        (fonts.size ? Array.from(fonts).map(function(f) {
-          return '<span class="bg-white border border-slate-200 rounded px-1.5 py-0.5 font-medium">' + escapeHtml(f) + '</span>';
-        }).join(' ') : '<span class="text-slate-400">None detected</span>');
-
-      // Canvas
-      var canvas = profile.canvas_size || {};
-      document.getElementById('dsCanvas').textContent =
-        'Canvas: ' + (canvas.width || '?') + '" \u00d7 ' + (canvas.height || '?') + '"' +
-        '  |  Main layouts: ' + (profile.layouts || []).length +
-        '  |  Additional: ' + (structure.additional_layouts || []).length;
-
-      // Full JSON detail
-      document.getElementById('dsProfileJson').textContent = JSON.stringify(ds, null, 2);
-    }
-
-    function toggleDeepDetail() {
-      deepDetailVisible = !deepDetailVisible;
-      document.getElementById('deepScanDetail').classList.toggle('hidden', !deepDetailVisible);
-      document.getElementById('deepDetailToggleText').textContent = deepDetailVisible ? 'Hide detail' : 'Show detail';
-    }
-
     /*  Build AI Prompt  */
     function buildAIPrompt() {
       var layoutJson = JSON.stringify(layoutData, null, 2);
@@ -671,38 +616,6 @@
         return null;
       }
 
-      // Build deep profile section if available
-      var deepProfileSection = '';
-      if (deepScanData && deepScanData.master_profile) {
-        var dp = deepScanData.master_profile;
-        var ds = deepScanData.master_structure || {};
-        var allDsLayouts = (dp.layouts || []).concat(ds.additional_layouts || []);
-        // Compact layout reference for AI
-        var profileRef = allDsLayouts.map(function(l) {
-          var phDescs = (l.placeholders || []).map(function(p) {
-            var font = p.font || {};
-            var desc = 'idx=' + p.idx + ' "' + (p.name || '') + '"';
-            if (font.name) desc += ' font=' + font.name;
-            if (font.size) desc += ' ' + font.size + 'pt';
-            if (font.bold) desc += ' bold';
-            if (font.color) desc += ' color=' + font.color;
-            if (p.pos) desc += ' pos=(' + (p.pos.left||0).toFixed(1) + ',' + (p.pos.top||0).toFixed(1) + ' ' + (p.pos.width||0).toFixed(1) + '\u00d7' + (p.pos.height||0).toFixed(1) + ')';
-            return desc;
-          });
-          return 'Layout[' + l.layout_index + '] "' + l.name + '"' + (l.pptx_layout ? ' (' + l.pptx_layout + ')' : '') + ':\n  ' + phDescs.join('\n  ');
-        }).join('\n');
-
-        deepProfileSection = '\n== MASTER DESIGN PROFILE ==\n' +
-          'Canvas: ' + (dp.canvas_size ? dp.canvas_size.width + '" \u00d7 ' + dp.canvas_size.height + '"' : 'unknown') + '\n' +
-          'Color palette: ' + JSON.stringify(dp.color_palette || {}) + '\n' +
-          'Fixed elements: ' + JSON.stringify(dp.fixed_elements || {}) + '\n\n' +
-          'Layout Details (with font, size, color, position for each placeholder):\n' +
-          profileRef + '\n\n' +
-          'IMPORTANT: Use the exact layout_index values shown above.\n' +
-          'Each placeholder has a fixed position and font in the master — write content to match.\n' +
-          'Title placeholders are typically idx=0. Body/content placeholders are idx=1 or idx=2.\n\n';
-      }
-
       return 'You are a PowerPoint slide content generator.\n\n' +
         '== PRESENTATION REQUIREMENTS ==\n' +
         'Topic / Content   : ' + topic + '\n' +
@@ -712,7 +625,6 @@
         'Below is the layout structure extracted from the PowerPoint Master file.\n' +
         'Each layout has an index, a name, and placeholders (idx, name, type).\n' +
         layoutJson + '\n\n' +
-        deepProfileSection +
         '== YOUR TASK ==\n' +
         'Generate exactly ' + count + ' slides about the topic above.\n' +
         'All text content MUST be written in: ' + language + '.\n\n' +
@@ -857,25 +769,24 @@
       selectedBuiltinId = null;
       var uploadSection  = document.getElementById('uploadSection');
       var builtinSection = document.getElementById('builtinSection');
+      var manualSection  = document.getElementById('manualSection');
       var profileInfo    = document.getElementById('profileModeInfo');
-      var btnMaster      = document.getElementById('modeUploadBtn');
       var btnBuiltin     = document.getElementById('modeBuiltinBtn');
-      var btnProfile     = document.getElementById('modeProfileBtn');
-      var activeClass    = 'flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600';
-      var inactiveClass  = 'flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50';
+      var btnManual      = document.getElementById('modeManualBtn');
+      var activeClass    = 'py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600';
+      var inactiveClass  = 'py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50';
 
       // Reset all
       uploadSection.classList.add('hidden');
       builtinSection.classList.add('hidden');
+      manualSection.classList.add('hidden');
       profileInfo.classList.add('hidden');
-      btnMaster.className  = inactiveClass;
       btnBuiltin.className = inactiveClass;
-      btnProfile.className = inactiveClass;
+      btnManual.className  = inactiveClass;
 
       if (mode === 'master') {
         uploadSection.classList.remove('hidden');
-        btnMaster.className  = activeClass;
-        if (uploadedFilename === '__profile__' || uploadedFilename === '__builtin__') {
+        if (uploadedFilename === '__profile__' || uploadedFilename === '__builtin__' || uploadedFilename === '__manual__') {
           uploadedFilename = '';
           layoutData = null;
           document.getElementById('layoutResult').classList.add('hidden');
@@ -884,10 +795,184 @@
         builtinSection.classList.remove('hidden');
         btnBuiltin.className = activeClass;
         loadBuiltinMasters();
+      } else if (mode === 'manual') {
+        manualSection.classList.remove('hidden');
+        btnManual.className = activeClass;
       } else {
         profileInfo.classList.remove('hidden');
-        btnProfile.className = activeClass;
         initBuiltinMode();
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       Manual Schema Import
+    ════════════════════════════════════════════════════════════════ */
+    function handleDragOver2(e) { e.preventDefault(); document.getElementById('manualDropZone').classList.add('drag-over'); }
+    function handleDragLeave2()  { document.getElementById('manualDropZone').classList.remove('drag-over'); }
+    function handleDrop2(e) {
+      e.preventDefault();
+      document.getElementById('manualDropZone').classList.remove('drag-over');
+      var file = e.dataTransfer.files[0];
+      if (file) applyManualFile(file);
+    }
+    function handleManualFileSelect(e) { var file = e.target.files[0]; if (file) applyManualFile(file); }
+    function applyManualFile(file) {
+      if (!file.name.toLowerCase().endsWith('.pptx')) { showToast('Chỉ hỗ trợ file .pptx.', '✕'); return; }
+      document.getElementById('manualFileName').textContent = file.name;
+      document.getElementById('manualFilePill').classList.remove('hidden');
+      document.getElementById('manualFilePill').classList.add('flex');
+      document.getElementById('manualUploadBtn').disabled = false;
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('manualPptxFile').files = dt.files;
+    }
+    function resetManualFile() {
+      document.getElementById('manualPptxFile').value = '';
+      document.getElementById('manualFilePill').classList.add('hidden');
+      document.getElementById('manualFilePill').classList.remove('flex');
+      document.getElementById('manualUploadBtn').disabled = true;
+      document.getElementById('manualSchemaArea').classList.add('hidden');
+      manualUploadedFilename = '';
+    }
+    function toggleBuiltinFields() {
+      var checked = document.getElementById('manualSaveBuiltin').checked;
+      document.getElementById('builtinFields').classList.toggle('hidden', !checked);
+    }
+
+    async function uploadManualPptx() {
+      var input  = document.getElementById('manualPptxFile');
+      var btn    = document.getElementById('manualUploadBtn');
+      var status = document.getElementById('manualUploadStatus');
+      if (!input.files.length) return;
+      var formData = new FormData();
+      formData.append('file', input.files[0]);
+      btn.disabled = true;
+      document.getElementById('manualUploadBtnText').innerHTML = '<span class="spinner"></span>&nbsp;Uploading…';
+      status.classList.remove('hidden');
+      status.className = 'text-xs mt-1 text-slate-400';
+      status.textContent = 'Uploading…';
+      try {
+        var res  = await fetch('/upload_master', { method: 'POST', body: formData });
+        var text = await res.text();
+        var data;
+        try { data = JSON.parse(text); }
+        catch (parseErr) {
+          // Server returned HTML (e.g. 500 error page) — show the raw status
+          status.textContent = '✕ Server lỗi (HTTP ' + res.status + '). Kiểm tra console để biết thêm.';
+          status.className = 'text-xs mt-1 text-red-500';
+          console.error('Server response was not JSON:\n', text.substring(0, 1000));
+          return;
+        }
+        if (!res.ok) {
+          status.textContent = '✕ ' + (data.error || 'Upload thất bại.');
+          status.className = 'text-xs mt-1 text-red-500';
+          return;
+        }
+        manualUploadedFilename = data.filename;
+        status.textContent = '✔ Đã upload: ' + data.filename + ' (' + data.total_layouts + ' layouts detected)';
+        status.className = 'text-xs mt-1 text-emerald-600';
+        document.getElementById('manualSchemaArea').classList.remove('hidden');
+        showToast('Upload thành công! Dán schema JSON vào ô bên dưới.', '✔');
+      } catch (err) {
+        status.textContent = 'Lỗi mạng: ' + err.message;
+        status.className = 'text-xs mt-1 text-red-500';
+      } finally {
+        btn.disabled = false;
+        document.getElementById('manualUploadBtnText').textContent = 'Upload PPTX';
+      }
+    }
+
+    async function importManualSchema() {
+      if (!manualUploadedFilename) {
+        showToast('Vui lòng upload file PPTX trước.', '⚠', 3000); return;
+      }
+      var rawSchema = document.getElementById('manualSchemaInput').value.trim();
+      if (!rawSchema) {
+        showToast('Vui lòng dán schema JSON vào ô text.', '⚠', 3000); return;
+      }
+      var parsedSchema;
+      try {
+        parsedSchema = JSON.parse(rawSchema);
+        if (!parsedSchema.layouts) throw new Error('Schema phải có trường "layouts".');
+      } catch (err) {
+        showToast('JSON không hợp lệ: ' + err.message, '✕', 4000); return;
+      }
+
+      var btn    = document.getElementById('manualImportBtn');
+      var status = document.getElementById('manualImportStatus');
+      btn.disabled = true;
+      document.getElementById('manualImportBtnText').innerHTML = '<span class="spinner"></span>&nbsp;Đang import…';
+      status.classList.remove('hidden');
+      status.className = 'text-xs mt-1 text-slate-400';
+      status.textContent = 'Đang lưu schema…';
+
+      try {
+        // Step 1: import_schema
+        var res  = await fetch('/import_schema', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ filename: manualUploadedFilename, schema: parsedSchema })
+        });
+        var merged = await res.json();
+        if (!res.ok) {
+          status.textContent = '✕ ' + (merged.error || 'Import thất bại.');
+          status.className = 'text-xs mt-1 text-red-500';
+          return;
+        }
+
+        // Update app state
+        layoutData = merged.layouts;
+        uploadedFilename = manualUploadedFilename;
+        renderLayoutTable({ filename: merged.filename || uploadedFilename, total_layouts: layoutData.length, layouts: layoutData.map(function(l) {
+          return {
+            layout_index: l.layout_index,
+            layout_name:  l.layout_name,
+            placeholders: (l.placeholders || []).map(function(p) { return { idx: p.idx, name: p.description || p.type, type: p.type }; })
+          };
+        }) });
+        document.getElementById('layoutResult').classList.remove('hidden');
+
+        status.textContent = '✔ Import thành công! ' + layoutData.length + ' layouts.';
+        status.className = 'text-xs mt-1 text-emerald-600';
+        showToast('Schema đã được import!', '✔');
+
+        // Step 2 (optional): save as built-in
+        var saveBuiltin = document.getElementById('manualSaveBuiltin').checked;
+        if (saveBuiltin) {
+          var bName = document.getElementById('builtinName').value.trim();
+          var bId   = document.getElementById('builtinId').value.trim();
+          if (!bName) {
+            showToast('Vui lòng nhập tên template để lưu built-in.', '⚠', 3000);
+            return;
+          }
+          status.textContent = 'Lưu vào thư viện built-in…';
+          var res2 = await fetch('/save_as_builtin', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+              filename:     manualUploadedFilename,
+              builtin_id:   bId || null,
+              builtin_name: bName,
+              schema:       merged
+            })
+          });
+          var result2 = await res2.json();
+          if (!res2.ok) {
+            status.textContent = '✔ Import OK, nhưng lưu built-in thất bại: ' + (result2.error || '');
+            status.className = 'text-xs mt-1 text-amber-600';
+          } else {
+            status.textContent = '✔ Lưu thành công! Template "' + result2.builtin_name + '" (id: ' + result2.builtin_id + ') đã có trong thư viện.';
+            status.className = 'text-xs mt-1 text-emerald-600';
+            showToast('Template đã lưu vào thư viện!', '🎉', 3500);
+          }
+        }
+
+      } catch (err) {
+        status.textContent = 'Lỗi mạng: ' + err.message;
+        status.className = 'text-xs mt-1 text-red-500';
+      } finally {
+        btn.disabled = false;
+        document.getElementById('manualImportBtnText').textContent = '\u{1F916} Import Schema';
       }
     }
 
@@ -992,37 +1077,23 @@
     }
 
     async function initBuiltinMode() {
-      try {
-        if (!builtinLayoutSchema || !Array.isArray(builtinLayoutSchema.layouts)) {
-          var res = await fetch('/layout_schema');
-          if (!res.ok) {
-            var errData = await res.json().catch(function() { return {}; });
-            throw new Error(errData.error || 'HTTP ' + res.status);
-          }
-          var data = await res.json();
-          if (!data.layouts || !Array.isArray(data.layouts)) {
-            throw new Error('Schema không có danh sách layouts hợp lệ.');
-          }
-          builtinLayoutSchema = data;
-        }
-        // Build a layoutData-compatible array for buildAIPrompt
-        var identity = builtinLayoutSchema.template_identity || 'Built-in Template';
-        layoutData = builtinLayoutSchema.layouts.map(function(l) {
-          return {
-            layout_index: l.layout_index,
-            layout_name:  l.name,
-            placeholders: (l.placeholders || []).map(function(p) {
-              return { idx: p.idx, name: p.name, type: p.font ? 'BODY' : 'OBJECT' };
-            })
-          };
-        });
-        // renderLayoutTable expects {filename, total_layouts, layouts:[]}
-        renderLayoutTable({ filename: identity, total_layouts: layoutData.length, layouts: layoutData });
-        document.getElementById('layoutResult').classList.remove('hidden');
-        uploadedFilename = '__profile__';
-      } catch (e) {
-        showToast('Kh\u00f4ng th\u1ec3 t\u1ea3i layout schema: ' + e.message, '\u26a0', 4000);
+      if (!builtinLayoutSchema) {
+        showToast('Vui lòng chọn một built-in master trước.', '\u26a0', 3000);
+        return;
       }
+      var identity = builtinLayoutSchema.template_identity || builtinLayoutSchema.name || 'Built-in Template';
+      layoutData = builtinLayoutSchema.layouts.map(function(l) {
+        return {
+          layout_index: l.layout_index,
+          layout_name:  l.name,
+          placeholders: (l.placeholders || []).map(function(p) {
+            return { idx: p.idx, name: p.name, type: p.ph_type || 'BODY' };
+          })
+        };
+      });
+      renderLayoutTable({ filename: identity, total_layouts: layoutData.length, layouts: layoutData });
+      document.getElementById('layoutResult').classList.remove('hidden');
+      uploadedFilename = '__profile__';
     }
 
     function toggleSavedPanel() {
@@ -1213,9 +1284,6 @@
       fetch('/list_masters').then(function(r) { return r.json(); }).then(function(d) {
         var n = (d.masters || []).length;
         document.getElementById('masterBadge').textContent = n;
-      }).catch(function() {});
-      fetch('/layout_schema').then(function(r) { return r.ok ? r.json() : null; }).then(function(d) {
-        if (d && Array.isArray(d.layouts) && d.layouts.length > 0) builtinLayoutSchema = d;
       }).catch(function() {});
     });
   </script>
