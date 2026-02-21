@@ -1,0 +1,301 @@
+{
+  "file": "master1",
+  "canvas": {
+    "width_inches": 13.33,
+    "height_inches": 7.5
+  },
+  "theme_colors": {
+    "dk1": "#000000",
+    "lt1": "#FFFFFF",
+    "dk2": "#44546A",
+    "lt2": "#E7E6E6",
+    "accent1": "#4472C4",
+    "accent2": "#ED7D31",
+    "accent3": "#A5A5A5",
+    "accent4": "#FFC000",
+    "accent5": "#5B9BD5",
+    "accent6": "#70AD47",
+    "hlink": "#0563C1",
+    "folHlink": "#954F72"
+  },
+  "theme_fonts": {
+    "major_latin": "Arial",
+    "minor_latin": "Arial"
+  },
+  "layouts": [
+    {
+      "layout_index": 0,
+      "master_index": 0,
+      "local_layout_index": 0,
+      "layout_name": "SECTION_HEADER",
+      "use_for": "Section divider between major topics",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        },
+        {
+          "idx": 2,
+          "type": "TITLE",
+          "description": "Additional title / heading (idx=2)"
+        },
+        {
+          "idx": 3,
+          "type": "TITLE",
+          "description": "Narrow title / label"
+        }
+      ]
+    },
+    {
+      "layout_index": 1,
+      "master_index": 0,
+      "local_layout_index": 1,
+      "layout_name": "Cover 4",
+      "use_for": "Cover 4",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        }
+      ]
+    },
+    {
+      "layout_index": 2,
+      "master_index": 0,
+      "local_layout_index": 2,
+      "layout_name": "TITLE",
+      "use_for": "Cover / title slide of the presentation",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "CENTER_TITLE",
+          "description": "Main title (centered)"
+        },
+        {
+          "idx": 1,
+          "type": "SUBTITLE",
+          "description": "Subtitle / presenter name / date"
+        }
+      ]
+    },
+    {
+      "layout_index": 3,
+      "master_index": 0,
+      "local_layout_index": 3,
+      "layout_name": "Cover 2",
+      "use_for": "Cover 2",
+      "usable": false,
+      "placeholders": []
+    },
+    {
+      "layout_index": 4,
+      "master_index": 1,
+      "local_layout_index": 0,
+      "layout_name": "1_Custom Layout",
+      "use_for": "1_Custom Layout",
+      "usable": false,
+      "placeholders": []
+    },
+    {
+      "layout_index": 5,
+      "master_index": 1,
+      "local_layout_index": 1,
+      "layout_name": "Custom Layout",
+      "use_for": "Custom Layout",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        }
+      ]
+    },
+    {
+      "layout_index": 6,
+      "master_index": 2,
+      "local_layout_index": 0,
+      "layout_name": "TITLE",
+      "use_for": "Cover / title slide of the presentation",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "CENTER_TITLE",
+          "description": "Main title (centered)"
+        }
+      ]
+    },
+    {
+      "layout_index": 7,
+      "master_index": 2,
+      "local_layout_index": 1,
+      "layout_name": "TWO_OBJECTS",
+      "use_for": "Two-column: title + left content (idx 1) + right content (idx 2)",
+      "usable": false,
+      "placeholders": []
+    },
+    {
+      "layout_index": 8,
+      "master_index": 2,
+      "local_layout_index": 2,
+      "layout_name": "OBJECT",
+      "use_for": "Standard slide: title + body text or bullet list",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Main content / bullet list"
+        }
+      ]
+    },
+    {
+      "layout_index": 9,
+      "master_index": 2,
+      "local_layout_index": 3,
+      "layout_name": "SECTION_HEADER",
+      "use_for": "Section divider between major topics",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Main content / bullet list"
+        }
+      ]
+    },
+    {
+      "layout_index": 10,
+      "master_index": 2,
+      "local_layout_index": 4,
+      "layout_name": "TWO_OBJECTS_WITH_TEXT",
+      "use_for": "Two-column with labels: idx 0=title, idx 1/3=column headers, idx 2/4=column body",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Content area"
+        },
+        {
+          "idx": 2,
+          "type": "BODY",
+          "description": "Right column content"
+        }
+      ]
+    },
+    {
+      "layout_index": 11,
+      "master_index": 3,
+      "local_layout_index": 0,
+      "layout_name": "SECTION_HEADER",
+      "use_for": "Section divider between major topics",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        }
+      ]
+    },
+    {
+      "layout_index": 12,
+      "master_index": 3,
+      "local_layout_index": 3,
+      "layout_name": "TWO_OBJECTS",
+      "use_for": "Two-column: title + left content (idx 1) + right content (idx 2)",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Left column content"
+        },
+        {
+          "idx": 2,
+          "type": "BODY",
+          "description": "Right column content"
+        }
+      ]
+    },
+    {
+      "layout_index": 13,
+      "master_index": 3,
+      "local_layout_index": 4,
+      "layout_name": "TWO_OBJECTS_WITH_TEXT",
+      "use_for": "Two-column with labels: idx 0=title, idx 1/3=column headers, idx 2/4=column body",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Slide title"
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Left column content"
+        },
+        {
+          "idx": 2,
+          "type": "BODY",
+          "description": "Left column main content"
+        },
+        {
+          "idx": 3,
+          "type": "BODY",
+          "description": "Right column header / label"
+        },
+        {
+          "idx": 4,
+          "type": "BODY",
+          "description": "Right column main content"
+        }
+      ]
+    },
+    {
+      "layout_index": 14,
+      "master_index": 4,
+      "local_layout_index": 0,
+      "layout_name": "TITLE",
+      "use_for": "Cover / title slide of the presentation",
+      "usable": true,
+      "placeholders": [
+        {
+          "idx": 1,
+          "type": "SUBTITLE",
+          "description": "Subtitle / presenter name / date"
+        }
+      ]
+    }
+  ],
+  "filename": "master1.pptx",
+  "saved_at": "2026-02-21T10:29:55"
+}

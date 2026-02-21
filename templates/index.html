@@ -89,15 +89,30 @@
         <div class="flex gap-2">
           <button id="modeUploadBtn" onclick="setMode('master')"
                   class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600">
-            &#128194; Upload Master PPTX
+            &#128194; Upload PPTX
+          </button>
+          <button id="modeBuiltinBtn" onclick="setMode('builtin')"
+                  class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
+            &#127912; Master c&oacute; s&#7861;n
           </button>
           <button id="modeProfileBtn" onclick="setMode('profile')"
                   class="flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
-            &#10024; D&ugrave;ng Template c&oacute; s&#7861;n
+            &#10024; Profile
           </button>
         </div>
         <div id="profileModeInfo" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700">
           <strong>VTI Japan Profile</strong> &mdash; 7 layouts, font <em>Meiryo UI</em>, m&agrave;u ch&#7911; <span class="font-mono">#C00000</span>. Kh&ocirc;ng c&#7847;n upload file PPTX.
+        </div>
+      </div>
+
+      <!-- Built-in master selector (hidden in other modes) -->
+      <div id="builtinSection" class="hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-4">
+          <h2 class="text-base font-semibold text-slate-700">Ch&#7885;n Master Template c&oacute; s&#7861;n</h2>
+          <div id="builtinMasterList" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <p class="text-sm text-slate-400 col-span-3">&#8987; Đang tải danh sách master…</p>
+          </div>
+          <p id="builtinSelectStatus" class="text-xs text-slate-400 hidden"></p>
         </div>
       </div>
 
@@ -364,6 +379,7 @@
     let uploadedFilename = "";
     let validatedJson = null;
     let useBuiltinProfile = false;
+    let selectedBuiltinId = null;   // id of chosen built-in master
     let builtinLayoutSchema = null;
     let deepScanData = null;
     let deepDetailVisible = false;
@@ -792,7 +808,9 @@
       dl.classList.add('hidden');
       try {
         var payload = { slides: validatedJson };
-        if (useBuiltinProfile) {
+        if (selectedBuiltinId) {
+          payload.builtin_id = selectedBuiltinId;
+        } else if (useBuiltinProfile) {
           payload.mode = 'profile';
         } else {
           payload.filename = uploadedFilename;
@@ -836,30 +854,140 @@
     ════════════════════════════════════════════════════════════════ */
     function setMode(mode) {
       useBuiltinProfile = (mode === 'profile');
+      selectedBuiltinId = null;
       var uploadSection  = document.getElementById('uploadSection');
+      var builtinSection = document.getElementById('builtinSection');
       var profileInfo    = document.getElementById('profileModeInfo');
       var btnMaster      = document.getElementById('modeUploadBtn');
+      var btnBuiltin     = document.getElementById('modeBuiltinBtn');
       var btnProfile     = document.getElementById('modeProfileBtn');
       var activeClass    = 'flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600';
       var inactiveClass  = 'flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50';
 
-      if (useBuiltinProfile) {
-        uploadSection.classList.add('hidden');
-        profileInfo.classList.remove('hidden');
-        btnMaster.className  = inactiveClass;
-        btnProfile.className = activeClass;
-        initBuiltinMode();
-      } else {
+      // Reset all
+      uploadSection.classList.add('hidden');
+      builtinSection.classList.add('hidden');
+      profileInfo.classList.add('hidden');
+      btnMaster.className  = inactiveClass;
+      btnBuiltin.className = inactiveClass;
+      btnProfile.className = inactiveClass;
+
+      if (mode === 'master') {
         uploadSection.classList.remove('hidden');
-        profileInfo.classList.add('hidden');
         btnMaster.className  = activeClass;
-        btnProfile.className = inactiveClass;
-        // Reset if we switched away from profile
-        if (uploadedFilename === '__profile__') {
+        if (uploadedFilename === '__profile__' || uploadedFilename === '__builtin__') {
           uploadedFilename = '';
           layoutData = null;
           document.getElementById('layoutResult').classList.add('hidden');
         }
+      } else if (mode === 'builtin') {
+        builtinSection.classList.remove('hidden');
+        btnBuiltin.className = activeClass;
+        loadBuiltinMasters();
+      } else {
+        profileInfo.classList.remove('hidden');
+        btnProfile.className = activeClass;
+        initBuiltinMode();
+      }
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Built-in master selector
+    ──────────────────────────────────────────────────────────── */
+    async function loadBuiltinMasters() {
+      var list = document.getElementById('builtinMasterList');
+      list.innerHTML = '<p class="text-sm text-slate-400 col-span-3">&#8987; Đang tải…</p>';
+      try {
+        var res  = await fetch('/list_builtin_masters');
+        var data = await res.json();
+        var masters = data.masters || [];
+        if (masters.length === 0) {
+          list.innerHTML = '<p class="text-sm text-slate-400 col-span-3">Không có master nào trong thư mục master_slide/.</p>';
+          return;
+        }
+        list.innerHTML = '';
+        masters.forEach(function(m) {
+          var card = document.createElement('div');
+          card.id = 'builtinCard_' + m.id;
+          card.className = 'relative cursor-pointer rounded-xl border-2 border-slate-200 p-4 hover:border-blue-400 hover:shadow-md transition-all space-y-2';
+          card.onclick = function() { selectBuiltinMaster(m); };
+
+          // Color swatches
+          var swatchRow = document.createElement('div');
+          swatchRow.className = 'flex gap-1 mb-1';
+          var palette = m.color_palette || {};
+          var swatchColors = [palette.primary, palette.text_main, palette.background_alt, palette.accent2, palette.accent3].filter(Boolean).slice(0, 5);
+          swatchColors.forEach(function(c) {
+            var s = document.createElement('span');
+            s.style.cssText = 'display:inline-block;width:14px;height:14px;border-radius:50%;background:' + c + ';border:1px solid rgba(0,0,0,.1)';
+            swatchRow.appendChild(s);
+          });
+
+          var nameEl = document.createElement('p');
+          nameEl.className = 'text-sm font-semibold text-slate-800 truncate';
+          nameEl.textContent = m.name || m.id;
+
+          var meta = document.createElement('p');
+          meta.className = 'text-xs text-slate-400';
+          var fontName = (m.theme_fonts || {}).major_latin || '—';
+          meta.textContent = m.total_layouts + ' layouts · ' + fontName;
+
+          var badge = document.createElement('span');
+          badge.id = 'builtinBadge_' + m.id;
+          badge.className = 'hidden absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full';
+          badge.textContent = '✓ Selected';
+
+          card.appendChild(swatchRow);
+          card.appendChild(nameEl);
+          card.appendChild(meta);
+          card.appendChild(badge);
+          list.appendChild(card);
+        });
+      } catch (err) {
+        list.innerHTML = '<p class="text-sm text-red-500 col-span-3">Lỗi: ' + escapeHtml(err.message) + '</p>';
+      }
+    }
+
+    async function selectBuiltinMaster(m) {
+      // Deselect all cards
+      document.querySelectorAll('[id^="builtinCard_"]').forEach(function(c) {
+        c.className = c.className.replace(/border-blue-[0-9]+/g, 'border-slate-200').replace('bg-blue-50', '');
+      });
+      document.querySelectorAll('[id^="builtinBadge_"]').forEach(function(b) { b.classList.add('hidden'); });
+
+      // Highlight selected
+      var card  = document.getElementById('builtinCard_'  + m.id);
+      var badge = document.getElementById('builtinBadge_' + m.id);
+      if (card)  card.className  = card.className.replace('border-slate-200', 'border-blue-500') + ' bg-blue-50';
+      if (badge) badge.classList.remove('hidden');
+
+      selectedBuiltinId = m.id;
+      uploadedFilename  = '__builtin__';
+
+      var statusEl = document.getElementById('builtinSelectStatus');
+      statusEl.textContent = '&#8987; Đang tải layout schema cho ' + m.name + '…';
+      statusEl.classList.remove('hidden');
+      try {
+        var res  = await fetch('/builtin_schema/' + encodeURIComponent(m.id));
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        var schema = await res.json();
+        layoutData = schema.layouts.map(function(l) {
+          return {
+            layout_index: l.layout_index,
+            layout_name:  l.name,
+            placeholders: (l.placeholders || []).map(function(p) {
+              return { idx: p.idx, name: p.name, type: p.ph_type || 'BODY' };
+            })
+          };
+        });
+        renderLayoutTable({ filename: m.name, total_layouts: layoutData.length, layouts: layoutData });
+        document.getElementById('layoutResult').classList.remove('hidden');
+        statusEl.textContent = '✔ Đã tải ' + layoutData.length + ' layouts từ ' + m.name;
+        statusEl.className = 'text-xs text-emerald-600';
+        statusEl.classList.remove('hidden');
+      } catch (e) {
+        statusEl.textContent = '✕ Lỗi tải schema: ' + e.message;
+        statusEl.className = 'text-xs text-red-500';
       }
     }
 
