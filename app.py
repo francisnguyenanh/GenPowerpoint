@@ -48,6 +48,40 @@ def _schema_json_path(pptx_filename: str) -> str:
 MASTER_SLIDE_PATH    = os.path.join(BASE_DIR, "master_slide.pptx")
 BUILTIN_MASTER_DIR   = os.path.join(BASE_DIR, "master_slide")      # .pptx files
 BUILTIN_PROFILES_DIR = os.path.join(BASE_DIR, "builtin_profiles")  # pre-scanned JSONs
+PROMPT_TEMPLATE_PATH = os.path.join(BASE_DIR, "prompt_template.json")
+
+DEFAULT_PROMPT_TEMPLATE = """Tôi có một file PowerPoint template (.pptx) tên là \"{filename}".
+Tôi cần bạn tạo schema JSON mô tả cấu trúc layouts của file này để dùng tự động generate slide.
+
+Hãy trả về JSON theo đúng định dạng sau — KHÔNG có markdown, KHÔNG có giải thích:
+{
+  "layouts": [
+    {
+      "layout_index": 0,
+      "layout_name": "Tên layout (đúng theo PowerPoint)",
+      "use_for": "Mô tả ngắn mục đích layout (ví dụ: Title slide, Content slide...)",
+      "content_guidance": "Hướng dẫn fill nội dung: số từ, phong cách, số bullet tối đa...",
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE",
+          "description": "Mô tả placeholder này làm gì"
+        },
+        {
+          "idx": 1,
+          "type": "BODY",
+          "description": "Mô tả placeholder này làm gì"
+        }
+      ]
+    }
+  ]
+}
+
+Yêu cầu:
+1. Liệt kê TẤT CẢ layouts (thường 10–20 layouts)
+2. layout_index bắt đầu từ 0, tăng liên tục
+3. type: TITLE / CENTER_TITLE / SUBTITLE / BODY / PICTURE / OBJECT / DATE / FOOTER / SLIDE_NUMBER
+4. Chỉ trả về JSON hợp lệ"""
 
 
 @app.route("/")
@@ -205,6 +239,35 @@ def upload_master():
         "total_layouts": 0,
         "layouts":       [],
     })
+
+
+# ── /prompt_template ─────────────────────────────────────────────────────────
+@app.route("/prompt_template", methods=["GET"])
+def get_prompt_template():
+    """Return the saved prompt template (or the built-in default)."""
+    if os.path.isfile(PROMPT_TEMPLATE_PATH):
+        try:
+            with open(PROMPT_TEMPLATE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return jsonify(data)
+        except Exception:
+            pass
+    return jsonify({"template": DEFAULT_PROMPT_TEMPLATE, "saved_at": None})
+
+
+@app.route("/save_prompt_template", methods=["POST"])
+def save_prompt_template():
+    """Persist a user-edited prompt template to prompt_template.json."""
+    body = request.get_json(silent=True)
+    if not body or "template" not in body:
+        return jsonify({"error": "'template' field required."}), 400
+    data = {
+        "template": body["template"],
+        "saved_at": datetime.datetime.now().isoformat(timespec="seconds"),
+    }
+    with open(PROMPT_TEMPLATE_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    return jsonify({"ok": True, "saved_at": data["saved_at"]})
 
 
 # ── /import_schema ───────────────────────────────────────────────────────────

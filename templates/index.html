@@ -116,11 +116,32 @@
       <div id="manualSection" class="hidden">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-4">
           <h2 class="text-base font-semibold text-slate-700">&#129302; Import Schema t&#7915; AI</h2>
-          <p class="text-xs text-slate-500">Upload file PPTX, sau đó dán schema JSON do AI (Claude, GPT…) phân tích thủ công vào ô bên dưới.</p>
+          <p class="text-xs text-slate-500">Copy prompt, dán vào AI để nhận schema JSON, sau đó upload PPTX và dán schema vào ô bên dưới.</p>
 
-          <!-- PPTX upload -->
+          <!-- Bước 1: Prompt AI (always visible) -->
+          <div class="border border-blue-200 bg-blue-50/40 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-blue-700">&#128203; Bước 1 — Prompt cho AI (có thể chỉnh sửa)</span>
+              <div class="flex gap-2">
+                <button onclick="savePromptTemplate()"
+                        class="text-xs px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors">
+                  <span id="savePromptBtnText">&#128190; Lưu template</span>
+                </button>
+                <button onclick="copySchemaPrompt()"
+                        class="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                  <span id="copySchemaPromptBtnText">&#128203; Copy Prompt</span>
+                </button>
+              </div>
+            </div>
+            <p class="text-xs text-blue-600 mb-2">Chỉnh sửa prompt rồi Copy → dán vào AI (Claude / ChatGPT) kèm screenshot slide → nhận schema JSON.</p>
+            <textarea id="schemaPromptTextarea" rows="10"
+                      class="w-full border border-blue-200 rounded-lg p-2.5 text-xs font-mono text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"></textarea>
+            <p id="savePromptStatus" class="hidden text-xs mt-1"></p>
+          </div>
+
+          <!-- Bước 2: PPTX upload -->
           <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 1 &mdash; Upload file PPTX</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 2 &mdash; Upload file PPTX</label>
             <div id="manualDropZone"
                  class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer transition-colors hover:border-blue-400 hover:bg-blue-50"
                  onclick="document.getElementById('manualPptxFile').click()"
@@ -145,7 +166,7 @@
 
           <!-- Schema JSON textarea -->
           <div id="manualSchemaArea" class="hidden">
-            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 2 &mdash; Dán Schema JSON từ AI</label>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 3 &mdash; Dán Schema JSON từ AI</label>
             <p class="text-xs text-slate-400 mb-2">Dùng <strong>Claude / ChatGPT</strong> để phân tích file PPTX và xuất ra định dạng schema JSON (có <code class="bg-slate-100 px-1 rounded">content_guidance</code>, <code class="bg-slate-100 px-1 rounded">max_words</code>…).</p>
             <textarea id="manualSchemaInput" rows="10"
                       placeholder='{
@@ -435,6 +456,7 @@
     let useBuiltinProfile = false;
     let selectedBuiltinId = null;
     let builtinLayoutSchema = null;
+    let schemaPromptTemplate = "";  // raw template with {filename} placeholder
     let manualUploadedFilename = "";  // pptx uploaded in manual mode
 
     /*  Step navigation  */
@@ -798,6 +820,7 @@
       } else if (mode === 'manual') {
         manualSection.classList.remove('hidden');
         btnManual.className = activeClass;
+        loadPromptTemplate();
       } else {
         profileInfo.classList.remove('hidden');
         initBuiltinMode();
@@ -807,6 +830,71 @@
     /* ════════════════════════════════════════════════════════════════
        Manual Schema Import
     ════════════════════════════════════════════════════════════════ */
+
+    /* Prompt template helpers */
+    async function loadPromptTemplate() {
+      try {
+        var res = await fetch('/prompt_template');
+        if (!res.ok) return;
+        var data = await res.json();
+        schemaPromptTemplate = data.template || '';
+        var fname = manualUploadedFilename || '{filename}';
+        document.getElementById('schemaPromptTextarea').value =
+          schemaPromptTemplate.replace(/\{filename\}/g, fname);
+      } catch (e) {}
+    }
+
+    function injectFilenameIntoPrompt(fname) {
+      var ta = document.getElementById('schemaPromptTextarea');
+      if (ta && ta.value) {
+        ta.value = ta.value.replace(/\{filename\}/g, fname);
+      }
+    }
+
+    function copySchemaPrompt() {
+      var text = document.getElementById('schemaPromptTextarea').value;
+      if (!text.trim()) { showToast('Prompt đang trống!', '\u26a0', 2000); return; }
+      var btn = document.getElementById('copySchemaPromptBtnText');
+      function onCopied() {
+        btn.textContent = '\u2714 Đã copy!';
+        showToast('Prompt đã được copy!', '\uD83D\uDCCB', 2000);
+        setTimeout(function() { btn.textContent = '\uD83D\uDCCB Copy Prompt'; }, 2200);
+      }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(onCopied);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        onCopied();
+      }
+    }
+
+    async function savePromptTemplate() {
+      var text = document.getElementById('schemaPromptTextarea').value;
+      if (!text.trim()) return;
+      var btn = document.getElementById('savePromptBtnText');
+      var orig = btn.textContent;
+      btn.textContent = 'Đang lưu…';
+      try {
+        var res = await fetch('/save_prompt_template', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ template: text })
+        });
+        if (res.ok) {
+          schemaPromptTemplate = text;
+          btn.textContent = '\u2714 Đã lưu!';
+          showToast('Đã lưu template prompt!', '\u2714', 2000);
+        } else {
+          btn.textContent = '\u2715 Lỗi';
+        }
+      } catch (e) {
+        btn.textContent = '\u2715 Lỗi mạng';
+      }
+      setTimeout(function() { btn.textContent = orig; }, 2500);
+    }
+
     function handleDragOver2(e) { e.preventDefault(); document.getElementById('manualDropZone').classList.add('drag-over'); }
     function handleDragLeave2()  { document.getElementById('manualDropZone').classList.remove('drag-over'); }
     function handleDrop2(e) {
