@@ -49,6 +49,7 @@ MASTER_SLIDE_PATH    = os.path.join(BASE_DIR, "master_slide.pptx")
 BUILTIN_MASTER_DIR   = os.path.join(BASE_DIR, "master_slide")      # .pptx files
 BUILTIN_PROFILES_DIR = os.path.join(BASE_DIR, "builtin_profiles")  # pre-scanned JSONs
 PROMPT_TEMPLATE_PATH = os.path.join(BASE_DIR, "prompt_template.json")
+AI_PROMPTS_PATH      = os.path.join(BASE_DIR, "ai_prompts.json")
 
 DEFAULT_PROMPT_TEMPLATE = """Tôi có một file PowerPoint template (.pptx) tên là \"{filename}".
 Tôi cần bạn tạo schema JSON mô tả cấu trúc layouts của file này để dùng tự động generate slide.
@@ -268,6 +269,43 @@ def save_prompt_template():
     with open(PROMPT_TEMPLATE_PATH, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     return jsonify({"ok": True, "saved_at": data["saved_at"]})
+
+
+# ── /ai_prompts ───────────────────────────────────────────────────────────────
+@app.route("/ai_prompts", methods=["GET"])
+def get_ai_prompts():
+    """Return saved AI prompt templates (topic + outline), or the defaults from ai_prompts.json."""
+    if os.path.isfile(AI_PROMPTS_PATH):
+        try:
+            with open(AI_PROMPTS_PATH, "r", encoding="utf-8") as f:
+                return jsonify(json.load(f))
+        except Exception:
+            pass
+    return jsonify({"topic_prompt": "", "outline_prompt": "", "saved_at": None})
+
+
+@app.route("/save_ai_prompts", methods=["POST"])
+def save_ai_prompts():
+    """Persist user-edited AI prompt templates to ai_prompts.json."""
+    body = request.get_json(silent=True)
+    if not body or ("topic_prompt" not in body and "outline_prompt" not in body):
+        return jsonify({"error": "At least one of 'topic_prompt' or 'outline_prompt' required."}), 400
+    # Load existing to merge
+    existing = {}
+    if os.path.isfile(AI_PROMPTS_PATH):
+        try:
+            with open(AI_PROMPTS_PATH, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        except Exception:
+            pass
+    if "topic_prompt" in body:
+        existing["topic_prompt"] = body["topic_prompt"]
+    if "outline_prompt" in body:
+        existing["outline_prompt"] = body["outline_prompt"]
+    existing["saved_at"] = datetime.datetime.now().isoformat(timespec="seconds")
+    with open(AI_PROMPTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(existing, f, ensure_ascii=False, indent=2)
+    return jsonify({"ok": True, "saved_at": existing["saved_at"]})
 
 
 # ── /import_schema ───────────────────────────────────────────────────────────

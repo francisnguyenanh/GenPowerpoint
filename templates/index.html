@@ -77,19 +77,36 @@
           </div>
 
           <!-- Bước 2: Nhập chủ đề -->
-          <div id="bStep2" class="hidden space-y-2 pt-4 border-t border-slate-100">
-            <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 2: Nh&#7853;p n&#7897;i dung / ch&#7911; &#273;&#7873; b&agrave;i thuy&#7871;t tr&igrave;nh</label>
-            <p class="text-xs text-slate-500">Gi&#7899;i thi&#7879;u ng&#7855;n v&#7873; n&#7897;i dung b&#7841;n mu&#7889;n t&#7841;o slide.</p>
-            <textarea id="builtinSlideTopic" rows="3"
-                      placeholder="V&iacute; d&#7909;: Gi&#7899;i thi&#7879;u s&#7843;n ph&#7849;m X cho kh&aacute;ch h&agrave;ng doanh nghi&#7879;p, t&#7853;p trung v&agrave;o t&iacute;nh n&#259;ng n&#7893;i b&#7853;t v&agrave; l&#7907;i &iacute;ch ROI"
-                      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"></textarea>
+          <div id="bStep2" class="hidden space-y-3 pt-4 border-t border-slate-100">
+            <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 2: Nh&#7853;p n&#7897;i dung b&agrave;i thuy&#7871;t tr&igrave;nh</label>
+            <!-- Option toggle -->
+            <div class="flex rounded-xl border border-slate-200 overflow-hidden text-xs font-semibold">
+              <button id="bTopicOpt1Btn" onclick="setBTopicMode('free')"
+                      class="flex-1 py-2 bg-blue-600 text-white transition-colors">&#128221; Nh&#7853;p ch&#7911; &#273;&#7873; t&#7921; do</button>
+              <button id="bTopicOpt2Btn" onclick="setBTopicMode('outline')"
+                      class="flex-1 py-2 bg-white text-slate-600 hover:bg-slate-50 transition-colors border-l border-slate-200">&#128196; Nh&#7853;p outline &#273;&atilde; c&oacute;</button>
+            </div>
+            <!-- Option 1: free topic -->
+            <div id="bTopicFree">
+              <p class="text-xs text-slate-500 mb-1">Nh&#7853;p ch&#7911; &#273;&#7873; ng&#7855;n, AI s&#7869; t&#7921; t&#7841;o outline &#273;&#7847;y &#273;&#7911;.</p>
+              <textarea id="builtinSlideTopic" rows="3"
+                        placeholder="V&iacute; d&#7909;: Gi&#7899;i thi&#7879;u s&#7843;n ph&#7849;m X cho kh&aacute;ch h&agrave;ng doanh nghi&#7879;p, t&#7853;p trung v&agrave;o t&iacute;nh n&#259;ng n&#7893;i b&#7853;t v&agrave; l&#7907;i &iacute;ch ROI"
+                        class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"></textarea>
+            </div>
+            <!-- Option 2: existing outline -->
+            <div id="bTopicOutline" class="hidden">
+              <p class="text-xs text-slate-500 mb-1">D&aacute;n outline c&oacute; s&#7861;n. AI s&#7869; ch&#7881; s&#7855;p x&#7871;p n&#7897;i dung v&agrave;o &#273;&#250;ng layout, <strong>kh&ocirc;ng thay &#273;&#7893;i n&#7897;i dung</strong>.</p>
+              <textarea id="builtinExistingOutline" rows="7"
+                        placeholder="Slide 1: T&#7921; gi&#7899;i thi&#7879;u&#10;- T&ecirc;n: ...&#10;- Vai tr&ograve;: ...&#10;&#10;Slide 2: Kinh nghi&#7879;m&#10;- ..."
+                        class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-blue-50/30 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y transition font-mono"></textarea>
+            </div>
           </div>
 
           <!-- Bước 3: Số lượng slide + ngôn ngữ -->
           <div id="bStep3" class="hidden space-y-3 pt-4 border-t border-slate-100">
             <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 3: Ch&#7885;n s&#7889; l&#432;&#7907;ng slide v&agrave; ng&ocirc;n ng&#7919;</label>
             <div class="flex gap-3">
-              <div class="flex-1">
+              <div id="bSlideCountWrap" class="flex-1">
                 <label class="block text-xs font-medium text-slate-500 mb-1">S&#7889; l&#432;&#7907;ng slide</label>
                 <input type="number" id="builtinSlideCount" value="7" min="1" max="50"
                        class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition" />
@@ -236,16 +253,31 @@
           <div id="mStep567" class="hidden space-y-6 pt-4 border-t border-slate-100">
             
             <!-- Bước 5 -->
-            <div class="space-y-2">
-              <label class="block text-sm font-bold text-blue-700">Bước 5: Nhập topic, số slide, ngôn ngữ</label>
-              <div>
-                <label class="block text-xs font-medium text-slate-500 mb-1">Nội dung / Chủ đề <span class="text-red-400">*</span></label>
+            <div class="space-y-3">
+              <label class="block text-sm font-bold text-blue-700">Bước 5: Nhập nội dung bài thuyết trình</label>
+              <!-- Option toggle -->
+              <div class="flex rounded-xl border border-slate-200 overflow-hidden text-xs font-semibold">
+                <button id="mTopicOpt1Btn" onclick="setMTopicMode('free')"
+                        class="flex-1 py-2 bg-blue-600 text-white transition-colors">&#128221; Nhập chủ đề tự do</button>
+                <button id="mTopicOpt2Btn" onclick="setMTopicMode('outline')"
+                        class="flex-1 py-2 bg-white text-slate-600 hover:bg-slate-50 transition-colors border-l border-slate-200">&#128196; Nhập outline đã có</button>
+              </div>
+              <!-- Option 1: free topic -->
+              <div id="mTopicFree">
+                <p class="text-xs text-slate-500 mb-1">Nhập chủ đề ngắn, AI sẽ tự tạo outline đầy đủ.</p>
                 <textarea id="manualSlideTopic" rows="2"
                           placeholder="Ví dụ: Giới thiệu sản phẩm X..."
                           class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
               </div>
+              <!-- Option 2: existing outline -->
+              <div id="mTopicOutline" class="hidden">
+                <p class="text-xs text-slate-500 mb-1">Dán outline có sẵn. AI sẽ chỉ sắp xếp nội dung vào đúng layout, <strong>không thay đổi nội dung</strong>.</p>
+                <textarea id="manualExistingOutline" rows="7"
+                          placeholder="Slide 1: Tự giới thiệu&#10;- Tên: ...&#10;- Vai trò: ...&#10;&#10;Slide 2: Kinh nghiệm&#10;- ..."
+                          class="w-full border border-blue-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-blue-50/30 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y transition font-mono"></textarea>
+              </div>
               <div class="flex gap-3">
-                <div class="flex-1">
+                <div id="mSlideCountWrap" class="flex-1">
                   <label class="block text-xs font-medium text-slate-500 mb-1">Số lượng slide</label>
                   <input type="number" id="manualSlideCount" value="7" min="1" max="50"
                          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400" />
@@ -313,6 +345,8 @@
     let builtinLayoutSchema = null;
     let schemaPromptTemplate = "";  // raw template with {filename} placeholder
     let manualUploadedFilename = "";  // pptx uploaded in manual mode
+    let aiTopicPromptTemplate = "";    // loaded from ai_prompts.json
+    let aiOutlinePromptTemplate = "";  // loaded from ai_prompts.json
 
     /*  Toast  */
     let toastTimer;
@@ -725,14 +759,25 @@
       if (!layoutData || !layoutData.length) {
         showToast('Schema chưa được import.', '\u26a0', 3000); return;
       }
-      var topic = (document.getElementById('manualSlideTopic').value || '').trim();
-      if (!topic) {
-        document.getElementById('manualSlideTopic').focus();
-        showToast('Nhập chủ đề bài thuyết trình trước.', '\u26a0', 3000); return;
-      }
-      var count = document.getElementById('manualSlideCount').value || '7';
       var language = document.getElementById('manualSlideLanguage').value || 'Ti\u1EBFng Vi\u1EC7t';
-      var prompt = buildAIPrompt(topic, count, language);
+      var isOutlineMode = !document.getElementById('mTopicOutline').classList.contains('hidden');
+      var prompt;
+      if (isOutlineMode) {
+        var outline = (document.getElementById('manualExistingOutline').value || '').trim();
+        if (!outline) {
+          document.getElementById('manualExistingOutline').focus();
+          showToast('Vui lòng nhập outline trước.', '\u26a0', 3000); return;
+        }
+        prompt = buildAIPromptFromOutline(outline, language);
+      } else {
+        var topic = (document.getElementById('manualSlideTopic').value || '').trim();
+        if (!topic) {
+          document.getElementById('manualSlideTopic').focus();
+          showToast('Nhập chủ đề bài thuyết trình trước.', '\u26a0', 3000); return;
+        }
+        var count = document.getElementById('manualSlideCount').value || '7';
+        prompt = buildAIPrompt(topic, count, language);
+      }
       if (!prompt) return;
       var btnText = document.getElementById('manualCopyOutlineBtnText');
       function onCopied() {
@@ -812,65 +857,79 @@
       }
     }
 
+    async function loadAIPrompts() {
+      try {
+        var res = await fetch('/ai_prompts');
+        if (!res.ok) return;
+        var data = await res.json();
+        if (data.topic_prompt)   aiTopicPromptTemplate   = data.topic_prompt;
+        if (data.outline_prompt) aiOutlinePromptTemplate = data.outline_prompt;
+      } catch (e) {}
+    }
+
     function buildAIPrompt(topic, count, language) {
       var layoutJson = JSON.stringify(layoutData, null, 2);
-      return 'You are a PowerPoint slide content generator.\n\n' +
-        '== PRESENTATION REQUIREMENTS ==\n' +
-        'Topic / Content   : ' + topic + '\n' +
-        'Number of slides  : ' + count + '\n' +
-        'Slide language    : ' + language + '\n\n' +
-        '== MASTER LAYOUT STRUCTURE ==\n' +
-        'Below is the layout structure extracted from the PowerPoint Master file.\n' +
-        'Each layout has an index, a name, and placeholders (idx, name, type).\n' +
-        layoutJson + '\n\n' +
-        '== YOUR TASK ==\n' +
-        'Generate exactly ' + count + ' slides about the topic above.\n' +
-        'All text content MUST be written in: ' + language + '.\n\n' +
-        'Strict rules:\n' +
-        '1. Return ONLY a valid JSON array — no markdown, no explanation, no code fences.\n' +
-        '2. The array must contain exactly ' + count + ' slide objects.\n' +
-        '3. Each slide object must have:\n' +
-        '   - "layout_index": (integer) index of the layout to use\n' +
-        '   - "title": short slide title (string)\n' +
-        '   - "placeholders": array of objects, each with:\n' +
-        '       { "id": <placeholder idx as integer>, "content": <string or string[]>, "type": "text" | "list" }\n' +
-        '4. For bullet-point content use type "list" with content as a string array.\n' +
-        '5. For plain text use type "text" with content as a string.\n' +
-        '6. Choose layouts intelligently (e.g., layout 0 for title slide, others for content).\n\n' +
-        '== EXAMPLE OUTPUT (2 slides) ==\n' +
-        '[\n' +
-        '  {\n' +
-        '    "layout_index": 0,\n' +
-        '    "title": "Tiêu đề bài thuyết trình",\n' +
-        '    "placeholders": [\n' +
-        '      { "id": 0, "content": "Tiêu đề bài thuyết trình", "type": "text" },\n' +
-        '      { "id": 1, "content": "Tên tác giả • Ngày tháng", "type": "text" }\n' +
-        '    ]\n' +
-        '  },\n' +
-        '  {\n' +
-        '    "layout_index": 1,\n' +
-        '    "title": "Nội dung chính",\n' +
-        '    "placeholders": [\n' +
-        '      { "id": 0, "content": "Nội dung chính", "type": "text" },\n' +
-        '      { "id": 1, "content": ["Điểm 1", "Điểm 2", "Điểm 3"], "type": "list" }\n' +
-        '    ]\n' +
-        '  }\n' +
-        ']\n\n' +
-        'Now generate all ' + count + ' slides in ' + language + '. Return ONLY the JSON array.';
+      return aiTopicPromptTemplate
+        .replace(/\{topic\}/g,        topic)
+        .replace(/\{slide_count\}/g,  String(count))
+        .replace(/\{language\}/g,     language)
+        .replace(/\{layout_schema\}/g, layoutJson);
+    }
+
+    function buildAIPromptFromOutline(existingOutline, language) {
+      var layoutJson = JSON.stringify(layoutData, null, 2);
+      return aiOutlinePromptTemplate
+        .replace(/\{existing_outline\}/g, existingOutline)
+        .replace(/\{language\}/g,         language)
+        .replace(/\{layout_schema\}/g,    layoutJson);
+    }
+
+    /* ── Topic-mode toggles ───────────────────────────────────────── */
+    function setBTopicMode(mode) {
+      var isFree = (mode === 'free');
+      document.getElementById('bTopicFree').classList.toggle('hidden', !isFree);
+      document.getElementById('bTopicOutline').classList.toggle('hidden', isFree);
+      document.getElementById('bSlideCountWrap').classList.toggle('hidden', !isFree);
+      var activeBtn   = 'flex-1 py-2 bg-blue-600 text-white transition-colors';
+      var inactiveBtn = 'flex-1 py-2 bg-white text-slate-600 hover:bg-slate-50 transition-colors border-l border-slate-200';
+      document.getElementById('bTopicOpt1Btn').className = isFree ? activeBtn : inactiveBtn;
+      document.getElementById('bTopicOpt2Btn').className = isFree ? inactiveBtn : activeBtn;
+    }
+
+    function setMTopicMode(mode) {
+      var isFree = (mode === 'free');
+      document.getElementById('mTopicFree').classList.toggle('hidden', !isFree);
+      document.getElementById('mTopicOutline').classList.toggle('hidden', isFree);
+      document.getElementById('mSlideCountWrap').classList.toggle('hidden', !isFree);
+      var activeBtn   = 'flex-1 py-2 bg-blue-600 text-white transition-colors';
+      var inactiveBtn = 'flex-1 py-2 bg-white text-slate-600 hover:bg-slate-50 transition-colors border-l border-slate-200';
+      document.getElementById('mTopicOpt1Btn').className = isFree ? activeBtn : inactiveBtn;
+      document.getElementById('mTopicOpt2Btn').className = isFree ? inactiveBtn : activeBtn;
     }
 
     async function copyBuiltinPrompt() {
       if (!layoutData || !layoutData.length) {
         showToast('Vui lòng chọn master template trước.', '\u26a0', 3000); return;
       }
-      var topic = (document.getElementById('builtinSlideTopic').value || '').trim();
-      if (!topic) {
-        document.getElementById('builtinSlideTopic').focus();
-        showToast('Nhập chủ đề bài thuyết trình trước.', '\u26a0', 3000); return;
-      }
-      var count = document.getElementById('builtinSlideCount').value || '7';
       var language = document.getElementById('builtinSlideLanguage').value || 'Ti\u1EBFng Vi\u1EC7t';
-      var prompt = buildAIPrompt(topic, count, language);
+      var isOutlineMode = !document.getElementById('bTopicOutline').classList.contains('hidden');
+      var prompt;
+      if (isOutlineMode) {
+        var outline = (document.getElementById('builtinExistingOutline').value || '').trim();
+        if (!outline) {
+          document.getElementById('builtinExistingOutline').focus();
+          showToast('Vui lòng nhập outline trước.', '\u26a0', 3000); return;
+        }
+        prompt = buildAIPromptFromOutline(outline, language);
+      } else {
+        var topic = (document.getElementById('builtinSlideTopic').value || '').trim();
+        if (!topic) {
+          document.getElementById('builtinSlideTopic').focus();
+          showToast('Nhập chủ đề bài thuyết trình trước.', '\u26a0', 3000); return;
+        }
+        var count = document.getElementById('builtinSlideCount').value || '7';
+        prompt = buildAIPrompt(topic, count, language);
+      }
       if (!prompt) return;
       var btnText = document.getElementById('copyBuiltinPromptBtnText');
       function onCopied() {
@@ -988,15 +1047,7 @@
         var res  = await fetch('/builtin_schema/' + encodeURIComponent(m.id));
         if (!res.ok) throw new Error('HTTP ' + res.status);
         var schema = await res.json();
-        layoutData = schema.layouts.map(function(l) {
-          return {
-            layout_index: l.layout_index,
-            layout_name:  l.name,
-            placeholders: (l.placeholders || []).map(function(p) {
-              return { idx: p.idx, name: p.name, type: p.ph_type || 'BODY' };
-            })
-          };
-        });
+        layoutData = schema.layouts;
         statusEl.textContent = '\u2714 Đã tải ' + layoutData.length + ' layouts từ ' + m.name + '. Tiếp tục điền thông tin bên dưới.';
         statusEl.className = 'text-xs text-emerald-600';
         statusEl.classList.remove('hidden');
@@ -1019,6 +1070,7 @@
     ════════════════════════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function() {
       setMode('builtin');
+      loadAIPrompts();
     });
   </script>
 </body>
