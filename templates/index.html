@@ -32,10 +32,15 @@
         <path d="M8 21h8M12 17v4M7 8h5M7 11.5h3"/>
         <rect x="14" y="7" width="4" height="5" rx="1" fill="currentColor" stroke="none"/>
       </svg>
-      <div>
+      <div class="flex-1">
         <h1 class="text-lg font-bold text-blue-600 leading-none">GenPowerpoint</h1>
         <p class="text-xs text-slate-400">AI-powered slide generator</p>
       </div>
+      <button onclick="clearUploads()" title="Xóa tất cả file trong uploads/"
+              class="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition-colors">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        <span id="clearUploadsBtnText">Xóa uploads</span>
+      </button>
     </div>
   </header>
 
@@ -1068,9 +1073,38 @@
     /* ════════════════════════════════════════════════════════════════
        Init
     ════════════════════════════════════════════════════════════════ */
+    async function clearUploads() {
+      var btn = document.getElementById('clearUploadsBtnText');
+      var orig = btn.textContent;
+      if (!confirm('Xóa toàn bộ file trong thư mục uploads/?')) return;
+      btn.innerHTML = '<span class="spinner"></span>';
+      try {
+        var res = await fetch('/clear_uploads', { method: 'POST' });
+        var data = await res.json();
+        var n = data.deleted ? data.deleted.length : 0;
+        showToast('Đã xóa ' + n + ' file trong uploads/', '🗑️', 3000);
+        btn.textContent = '✔ Đã xóa (' + n + ')';
+      } catch (e) {
+        showToast('Lỗi khi xóa uploads', '⚠', 2000);
+        btn.textContent = '✕ Lỗi';
+      }
+      setTimeout(function() { btn.textContent = orig; }, 3000);
+    }
+
+    async function cleanupExpiredUploads() {
+      try {
+        var res = await fetch('/cleanup_expired_uploads', { method: 'POST' });
+        var data = await res.json();
+        if (data.count > 0) {
+          showToast('Đã tự động xóa ' + data.count + ' file upload hết hạn (>24h)', '🗑️', 3500);
+        }
+      } catch (e) {}
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       setMode('builtin');
       loadAIPrompts();
+      cleanupExpiredUploads();
     });
   </script>
 </body>

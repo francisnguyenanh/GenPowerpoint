@@ -1157,7 +1157,65 @@ def generate():
     )
 
 
+# ── /clear_uploads ───────────────────────────────────────────────────────────
+@app.route("/clear_uploads", methods=["POST"])
+def clear_uploads():
+    """Delete ALL files in the uploads folder."""
+    folder = app.config["UPLOAD_FOLDER"]
+    deleted = []
+    errors = []
+    if os.path.isdir(folder):
+        for fname in os.listdir(folder):
+            fpath = os.path.join(folder, fname)
+            if os.path.isfile(fpath):
+                try:
+                    os.remove(fpath)
+                    deleted.append(fname)
+                except Exception as e:
+                    errors.append(f"{fname}: {e}")
+    return jsonify({"ok": True, "deleted": deleted, "errors": errors})
+
+
+@app.route("/cleanup_expired_uploads", methods=["POST"])
+def cleanup_expired_uploads():
+    """Delete files in uploads/ that are older than 24 hours."""
+    folder = app.config["UPLOAD_FOLDER"]
+    deleted = []
+    now = datetime.datetime.now().timestamp()
+    max_age = 24 * 60 * 60  # 24 hours in seconds
+    if os.path.isdir(folder):
+        for fname in os.listdir(folder):
+            fpath = os.path.join(folder, fname)
+            if os.path.isfile(fpath):
+                try:
+                    age = now - os.path.getmtime(fpath)
+                    if age > max_age:
+                        os.remove(fpath)
+                        deleted.append(fname)
+                except Exception:
+                    pass
+    return jsonify({"ok": True, "deleted": deleted, "count": len(deleted)})
+
+
+def _startup_cleanup():
+    """Remove uploads older than 24 h on server start."""
+    folder = UPLOAD_FOLDER
+    if not os.path.isdir(folder):
+        return
+    now = datetime.datetime.now().timestamp()
+    max_age = 24 * 60 * 60
+    for fname in os.listdir(folder):
+        fpath = os.path.join(folder, fname)
+        if os.path.isfile(fpath):
+            try:
+                if now - os.path.getmtime(fpath) > max_age:
+                    os.remove(fpath)
+            except Exception:
+                pass
+
+
 # ── Entry point ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    _startup_cleanup()
     app.run(debug=True, host="0.0.0.0", port=5001)
