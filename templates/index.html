@@ -41,48 +41,9 @@
 
   <main class="max-w-3xl mx-auto px-4 py-8 space-y-8">
 
-    <!-- Stepper -->
-    <div class="flex items-center gap-0">
-      <div class="flex items-center gap-2">
-        <div id="stepCircle1" class="w-9 h-9 rounded-full bg-blue-600 text-white text-sm font-bold flex items-center justify-center shadow-md transition-all duration-300">1</div>
-        <span id="stepLabel1" class="text-sm font-semibold text-blue-600 hidden sm:inline">Upload Master</span>
-      </div>
-      <div class="step-line mx-2" id="line1"></div>
-      <div class="flex items-center gap-2">
-        <div id="stepCircle2" class="w-9 h-9 rounded-full bg-slate-200 text-slate-500 text-sm font-bold flex items-center justify-center transition-all duration-300">2</div>
-        <span id="stepLabel2" class="text-sm font-semibold text-slate-400 hidden sm:inline">Paste AI Response</span>
-      </div>
-      <div class="step-line mx-2" id="line2"></div>
-      <div class="flex items-center gap-2">
-        <div id="stepCircle3" class="w-9 h-9 rounded-full bg-slate-200 text-slate-500 text-sm font-bold flex items-center justify-center transition-all duration-300">3</div>
-        <span id="stepLabel3" class="text-sm font-semibold text-slate-400 hidden sm:inline">Generate PPTX</span>
-      </div>
-    </div>
-
     <!-- STEP 1 -->
     <section id="section1" class="step-section space-y-5">
 
-      <!-- Saved Masters panel -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <button onclick="toggleSavedPanel()"
-                class="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-              <polyline points="17 21 17 13 7 13 7 21"/>
-              <polyline points="7 3 7 8 15 8"/>
-            </svg>
-            Master đã lưu
-            <span id="masterBadge" class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
-          </span>
-          <svg id="savedPanelChevron" class="w-4 h-4 text-slate-400 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div id="savedPanel" class="hidden border-t border-slate-100">
-          <div id="savedMastersList" class="divide-y divide-slate-100 max-h-64 overflow-y-auto">
-            <p class="px-6 py-4 text-sm text-slate-400">Chưa có master nào được lưu.</p>
-          </div>
-        </div>
-      </div>
       <!-- Mode toggle -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Ch&#7871; &#273;&#7897; t&#7841;o slide</p>
@@ -96,52 +57,102 @@
             &#129302; Import Schema AI
           </button>
         </div>
-        <div id="profileModeInfo" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700">
-          <strong>VTI Japan Profile</strong> &mdash; 7 layouts, font <em>Meiryo UI</em>, m&agrave;u ch&#7911; <span class="font-mono">#C00000</span>. Kh&ocirc;ng c&#7847;n upload file PPTX.
-        </div>
       </div>
 
       <!-- Built-in master selector (hidden in other modes) -->
       <div id="builtinSection" class="hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-4">
-          <h2 class="text-base font-semibold text-slate-700">Ch&#7885;n Master Template c&oacute; s&#7861;n</h2>
-          <div id="builtinMasterList" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <p class="text-sm text-slate-400 col-span-3">&#8987; Đang tải danh sách master…</p>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-6">
+          <div>
+            <h2 class="text-base font-semibold text-slate-700">&#127912; Master c&oacute; s&#7861;n</h2>
+            <p class="text-xs text-slate-500 mt-1">Quy tr&igrave;nh 4 b&#432;&#7899;c &#273;&#7875; t&#7841;o slide t&#7915; template c&oacute; s&#7861;n.</p>
           </div>
-          <p id="builtinSelectStatus" class="text-xs text-slate-400 hidden"></p>
+
+          <!-- Bước 1: Chọn master -->
+          <div class="space-y-2">
+            <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 1: Ch&#7885;n master template</label>
+            <div id="builtinMasterList" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <p class="text-sm text-slate-400 col-span-3">&#8987; Đang tải danh sách master…</p>
+            </div>
+            <p id="builtinSelectStatus" class="text-xs text-slate-400 hidden"></p>
+          </div>
+
+          <!-- Bước 2: Nhập chủ đề -->
+          <div id="bStep2" class="hidden space-y-2 pt-4 border-t border-slate-100">
+            <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 2: Nh&#7853;p n&#7897;i dung / ch&#7911; &#273;&#7873; b&agrave;i thuy&#7871;t tr&igrave;nh</label>
+            <p class="text-xs text-slate-500">Gi&#7899;i thi&#7879;u ng&#7855;n v&#7873; n&#7897;i dung b&#7841;n mu&#7889;n t&#7841;o slide.</p>
+            <textarea id="builtinSlideTopic" rows="3"
+                      placeholder="V&iacute; d&#7909;: Gi&#7899;i thi&#7879;u s&#7843;n ph&#7849;m X cho kh&aacute;ch h&agrave;ng doanh nghi&#7879;p, t&#7853;p trung v&agrave;o t&iacute;nh n&#259;ng n&#7893;i b&#7853;t v&agrave; l&#7907;i &iacute;ch ROI"
+                      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"></textarea>
+          </div>
+
+          <!-- Bước 3: Số lượng slide + ngôn ngữ -->
+          <div id="bStep3" class="hidden space-y-3 pt-4 border-t border-slate-100">
+            <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 3: Ch&#7885;n s&#7889; l&#432;&#7907;ng slide v&agrave; ng&ocirc;n ng&#7919;</label>
+            <div class="flex gap-3">
+              <div class="flex-1">
+                <label class="block text-xs font-medium text-slate-500 mb-1">S&#7889; l&#432;&#7907;ng slide</label>
+                <input type="number" id="builtinSlideCount" value="7" min="1" max="50"
+                       class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition" />
+              </div>
+              <div class="flex-[2]">
+                <label class="block text-xs font-medium text-slate-500 mb-1">Ng&ocirc;n ng&#7919; trong slide</label>
+                <select id="builtinSlideLanguage"
+                        class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                  <option value="Ti&#7871;ng Vi&#7879;t">&#127987;&#65039; Ti&#7871;ng Vi&#7879;t</option>
+                  <option value="English">&#127468;&#127463; English</option>
+                  <option value="&#26085;&#26412;&#35486;">&#127471;&#127477; &#26085;&#26412;&#35486;</option>
+                  <option value="&#54620;&#44397;&#50612;">&#127472;&#127479; &#54620;&#44397;&#50612;</option>
+                  <option value="&#20013;&#25991;&#65288;&#31616;&#20307;&#65289;">&#127464;&#127475; &#20013;&#25991;&#65288;&#31616;&#20307;&#65289;</option>
+                  <option value="Fran&ccedil;ais">&#127467;&#127479; Fran&ccedil;ais</option>
+                  <option value="Deutsch">&#127465;&#127466; Deutsch</option>
+                  <option value="Espa&ntilde;ol">&#127466;&#127480; Espa&ntilde;ol</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bước 4: Copy prompt -->
+          <div id="bStep4" class="hidden space-y-3 pt-4 border-t border-slate-100">
+            <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 4: Copy prompt for AI gen outline slide</label>
+            <p class="text-xs text-slate-500">D&aacute;n prompt v&agrave;o AI (Claude / ChatGPT / Gemini), l&#7845;y JSON outline r&#7891;i d&aacute;n v&agrave;o <strong>B&#432;&#7899;c 5</strong> b&ecirc;n d&#432;&#7899;i.</p>
+            <button onclick="copyBuiltinPrompt()"
+                    class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+              <span id="copyBuiltinPromptBtnText">&#128203; Copy Prompt</span>
+            </button>
+          </div>
+
+          <!-- Bước 5: Dán outline JSON và tạo slide -->
+          <div id="bStep5" class="hidden space-y-2 pt-4 border-t border-slate-100">
+            <label class="block text-sm font-bold text-blue-700">B&#432;&#7899;c 5: D&aacute;n outline JSON v&agrave; t&#7841;o slide</label>
+            <p class="text-xs text-slate-500">D&aacute;n JSON outline t&#7915; AI v&agrave;o &#273;&acirc;y v&agrave; b&#7845;m t&#7841;o slide.</p>
+            <textarea id="builtinOutlineInput" rows="8"
+                      placeholder='[ { "layout_index": 0, "title": "...", "placeholders": [...] } ]'
+                      class="w-full border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"></textarea>
+            <button id="builtinGenerateBtn" onclick="generateBuiltinPptx()"
+                    class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md">
+              <span id="builtinGenerateBtnText">T&#7841;o Slide</span>
+            </button>
+            <div id="builtinGenerateStatus" class="hidden text-sm rounded-lg px-4 py-3"></div>
+            <a id="builtinDownloadLink" href="#" download
+               class="hidden w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+              Download PowerPoint
+            </a>
+          </div>
+
         </div>
       </div>
 
       <!-- Manual Schema Import section -->
       <div id="manualSection" class="hidden">
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-4">
-          <h2 class="text-base font-semibold text-slate-700">&#129302; Import Schema t&#7915; AI</h2>
-          <p class="text-xs text-slate-500">Copy prompt, dán vào AI để nhận schema JSON, sau đó upload PPTX và dán schema vào ô bên dưới.</p>
-
-          <!-- Bước 1: Prompt AI (always visible) -->
-          <div class="border border-blue-200 bg-blue-50/40 rounded-xl p-4">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-blue-700">&#128203; Bước 1 — Prompt cho AI (có thể chỉnh sửa)</span>
-              <div class="flex gap-2">
-                <button onclick="savePromptTemplate()"
-                        class="text-xs px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors">
-                  <span id="savePromptBtnText">&#128190; Lưu template</span>
-                </button>
-                <button onclick="copySchemaPrompt()"
-                        class="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
-                  <span id="copySchemaPromptBtnText">&#128203; Copy Prompt</span>
-                </button>
-              </div>
-            </div>
-            <p class="text-xs text-blue-600 mb-2">Chỉnh sửa prompt rồi Copy → dán vào AI (Claude / ChatGPT) kèm screenshot slide → nhận schema JSON.</p>
-            <textarea id="schemaPromptTextarea" rows="10"
-                      class="w-full border border-blue-200 rounded-lg p-2.5 text-xs font-mono text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"></textarea>
-            <p id="savePromptStatus" class="hidden text-xs mt-1"></p>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 space-y-6">
+          <div>
+            <h2 class="text-base font-semibold text-slate-700">&#129302; Import Schema t&#7915; AI</h2>
+            <p class="text-xs text-slate-500 mt-1">Quy trình 7 bước để tạo template mới và sinh slide tự động.</p>
           </div>
 
-          <!-- Bước 2: PPTX upload -->
-          <div>
-            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 2 &mdash; Upload file PPTX</label>
+          <!-- Bước 1: PPTX upload -->
+          <div id="mStep1" class="space-y-2">
+            <label class="block text-sm font-bold text-blue-700">Bước 1: Upload file PPTX</label>
             <div id="manualDropZone"
                  class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer transition-colors hover:border-blue-400 hover:bg-blue-50"
                  onclick="document.getElementById('manualPptxFile').click()"
@@ -164,281 +175,128 @@
             <p id="manualUploadStatus" class="hidden text-xs mt-1"></p>
           </div>
 
-          <!-- Schema JSON textarea -->
-          <div id="manualSchemaArea" class="hidden">
-            <label class="block text-xs font-medium text-slate-500 mb-1">Bước 3 &mdash; Dán Schema JSON từ AI</label>
-            <p class="text-xs text-slate-400 mb-2">Dùng <strong>Claude / ChatGPT</strong> để phân tích file PPTX và xuất ra định dạng schema JSON (có <code class="bg-slate-100 px-1 rounded">content_guidance</code>, <code class="bg-slate-100 px-1 rounded">max_words</code>…).</p>
-            <textarea id="manualSchemaInput" rows="10"
-                      placeholder='{
-  &quot;layouts&quot;: [
-    {
-      &quot;layout_index&quot;: 0,
-      &quot;layout_name&quot;: &quot;Title Slide&quot;,
-      &quot;use_for&quot;: &quot;Opening slide&quot;,
-      &quot;content_guidance&quot;: &quot;Bold title, subtitle with date&quot;,
-      &quot;placeholders&quot;: [
-        { &quot;idx&quot;: 0, &quot;type&quot;: &quot;CENTER_TITLE&quot;, &quot;description&quot;: &quot;Main title&quot; }
-      ]
-    }
-  ]
-}'
-                      class="w-full border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
-
-            <!-- Save as built-in checkbox -->
-            <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
-              <label class="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" id="manualSaveBuiltin" onchange="toggleBuiltinFields()" class="w-4 h-4 accent-amber-500" />
-                <span class="text-sm font-semibold text-amber-800">&#128190; Lưu vào thư viện template (built-in)</span>
-              </label>
-              <p class="text-xs text-amber-700">File PPTX + schema sẽ được sao chép vào thư mục <code class="bg-amber-100 px-1 rounded">master_slide/</code> vào xuất hiện trong mục “Master có sẵn”.</p>
-              <div id="builtinFields" class="hidden space-y-2 pt-1">
-                <div>
-                  <label class="block text-xs font-medium text-slate-500 mb-1">Tên template <span class="text-red-400">*</span></label>
-                  <input id="builtinName" type="text" placeholder="Ví dụ: VTI Corporate Blue"
-                         class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-slate-500 mb-1">ID (slug, tự động nếu bỏ trống)</label>
-                  <input id="builtinId" type="text" placeholder="Ví dụ: vti-corporate-blue"
-                         class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono" />
-                </div>
+          <!-- Bước 2: Prompt AI -->
+          <div id="mStep2" class="hidden space-y-2 pt-4 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-bold text-blue-700">Bước 2: Copy prompt for AI gen schema</label>
+              <div class="flex gap-2">
+                <button onclick="savePromptTemplate()"
+                        class="text-xs px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors">
+                  <span id="savePromptBtnText">&#128190; Lưu template</span>
+                </button>
+                <button onclick="copySchemaPrompt()"
+                        class="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                  <span id="copySchemaPromptBtnText">&#128203; Copy Prompt</span>
+                </button>
               </div>
             </div>
+            <p class="text-xs text-slate-500">Chỉnh sửa prompt nếu cần, sau đó Copy và dán vào AI (Claude / ChatGPT) kèm screenshot slide.</p>
+            <textarea id="schemaPromptTextarea" rows="6"
+                      class="w-full border border-blue-200 rounded-lg p-2.5 text-xs font-mono text-slate-700 bg-blue-50/30 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"></textarea>
+          </div>
 
+          <!-- Bước 3: Dán Schema JSON -->
+          <div id="mStep3" class="hidden space-y-2 pt-4 border-t border-slate-100">
+            <label class="block text-sm font-bold text-blue-700">Bước 3: Dán schema JSON vào ô text area</label>
+            <p class="text-xs text-slate-500">Copy JSON schema từ AI trả về và dán vào đây.</p>
+            <textarea id="manualSchemaInput" rows="8"
+                      placeholder='{ "layouts": [ ... ] }'
+                      class="w-full border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"></textarea>
             <button id="manualImportBtn" onclick="importManualSchema()"
-                    class="mt-3 w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+                    class="mt-2 w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
               <span id="manualImportBtnText">&#129302; Import Schema</span>
             </button>
             <p id="manualImportStatus" class="hidden text-xs mt-1"></p>
           </div>
-        </div>
-      </div>
 
-      <!-- Upload section (hidden in profile mode) -->
-      <div id="uploadSection">      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
-        <h2 class="text-base font-semibold text-slate-700">Step 1 — Upload your Master PPTX</h2>
-        <div id="dropZone"
-             class="border-2 border-dashed border-slate-300 rounded-xl p-10 text-center cursor-pointer transition-colors duration-200 hover:border-blue-400 hover:bg-blue-50"
-             onclick="document.getElementById('pptxFile').click()"
-             ondragover="handleDragOver(event)"
-             ondragleave="handleDragLeave(event)"
-             ondrop="handleDrop(event)">
-          <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M12 16V4m0 0L8 8m4-4 4 4"/>
-            <path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/>
-          </svg>
-          <p class="text-slate-600 font-medium">Drop your <span class="text-blue-600">.pptx</span> file here</p>
-          <p class="text-slate-400 text-sm mt-1">or click to browse</p>
-          <input type="file" id="pptxFile" accept=".pptx" class="hidden" onchange="handleFileSelect(event)" />
-        </div>
-
-        <div id="filePill" class="hidden items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
-          <svg class="w-4 h-4 text-blue-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-          <span id="fileName" class="text-sm text-blue-700 font-medium truncate flex-1"></span>
-          <button onclick="resetFile()" class="text-slate-400 hover:text-red-500 transition-colors text-xs bg-transparent border-0 cursor-pointer p-0">&#x2715;</button>
-        </div>
-
-        <button id="uploadBtn" onclick="uploadFile()"
-                class="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
-                disabled>
-          <span id="uploadBtnText">Upload PPTX</span>
-        </button>
-        <p id="uploadStatus" class="text-sm text-slate-400 hidden"></p>
-      </div>
-      </div><!-- /#uploadSection -->
-
-      <div id="layoutResult" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <h3 class="font-semibold text-slate-700" id="layoutSummary">Layouts found</h3>
-          <div class="flex items-center gap-2">
-            <button onclick="openEditModal()"
-                    class="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-              Chỉnh sửa Layout
-            </button>
-            <button onclick="copyPrompt()" id="copyBtn"
-                    class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-colors">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-              <span id="copyBtnText">Copy Prompt for AI</span>
-            </button>
-          </div>
-        </div>
-        <div id="layoutAccordion" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
-
-        <!-- Presentation details -->
-        <div class="border-t border-slate-100 pt-4 space-y-3">
-          <p class="text-sm font-semibold text-slate-600">Thông tin bài thuyết trình</p>
-
-          <div>
-            <label for="slideTopic" class="block text-xs font-medium text-slate-500 mb-1">Nội dung / Chủ đề muốn làm slide <span class="text-red-400">*</span></label>
-            <textarea id="slideTopic" rows="3"
-                      placeholder="Ví dụ: Giới thiệu sản phẩm X cho khách hàng doanh nghiệp, tập trung vào tính năng nổi bật và lợi ích ROI"
-                      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"></textarea>
-          </div>
-
-          <div class="flex gap-3">
-            <div class="flex-1">
-              <label for="slideCount" class="block text-xs font-medium text-slate-500 mb-1">Số lượng slide</label>
-              <input type="number" id="slideCount" value="7" min="1" max="50"
-                     class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition" />
-            </div>
-            <div class="flex-[2]">
-              <label for="slideLanguage" class="block text-xs font-medium text-slate-500 mb-1">Ngôn ngữ trong slide</label>
-              <select id="slideLanguage"
-                      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
-                <option value="Tiếng Việt">🇻🇳 Tiếng Việt</option>
-                <option value="English">🇬🇧 English</option>
-                <option value="日本語">🇯🇵 日本語</option>
-                <option value="한국어">🇰🇷 한국어</option>
-                <option value="中文（简体）">🇨🇳 中文（简体）</option>
-                <option value="Français">🇫🇷 Français</option>
-                <option value="Deutsch">🇩🇪 Deutsch</option>
-                <option value="Español">🇪🇸 Español</option>
-              </select>
+          <!-- Bước 4: Lưu template -->
+          <div id="mStep4" class="hidden space-y-3 pt-4 border-t border-slate-100">
+            <label class="block text-sm font-bold text-blue-700">Bước 4: Lưu template</label>
+            <p class="text-xs text-slate-500">Lưu file JSON và file PPTX vào thư mục builtin_profiles để sử dụng lại sau này.</p>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Tên template <span class="text-red-400">*</span></label>
+                <input id="manualBuiltinName" type="text" placeholder="Ví dụ: VTI Corporate Blue"
+                       class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">ID (slug, tự động nếu bỏ trống)</label>
+                <input id="manualBuiltinId" type="text" placeholder="Ví dụ: vti-corporate-blue"
+                       class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono" />
+              </div>
+              <button id="saveBuiltinBtn" onclick="saveManualBuiltin()"
+                      class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                <span id="saveBuiltinBtnText">&#128190; Lưu Template</span>
+              </button>
+              <p id="saveBuiltinStatus" class="hidden text-xs mt-1"></p>
             </div>
           </div>
-        </div>
 
-        <button onclick="goToStep2()"
-                class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">
-          Continue to Step 2 &#8594;
-        </button>
+          <!-- Bước 5, 6, 7: Tạo slide -->
+          <div id="mStep567" class="hidden space-y-6 pt-4 border-t border-slate-100">
+            
+            <!-- Bước 5 -->
+            <div class="space-y-2">
+              <label class="block text-sm font-bold text-blue-700">Bước 5: Nhập topic, số slide, ngôn ngữ</label>
+              <div>
+                <label class="block text-xs font-medium text-slate-500 mb-1">Nội dung / Chủ đề <span class="text-red-400">*</span></label>
+                <textarea id="manualSlideTopic" rows="2"
+                          placeholder="Ví dụ: Giới thiệu sản phẩm X..."
+                          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"></textarea>
+              </div>
+              <div class="flex gap-3">
+                <div class="flex-1">
+                  <label class="block text-xs font-medium text-slate-500 mb-1">Số lượng slide</label>
+                  <input type="number" id="manualSlideCount" value="7" min="1" max="50"
+                         class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div class="flex-[2]">
+                  <label class="block text-xs font-medium text-slate-500 mb-1">Ngôn ngữ</label>
+                  <select id="manualSlideLanguage"
+                          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option value="Tiếng Việt">🇻🇳 Tiếng Việt</option>
+                    <option value="English">🇬🇧 English</option>
+                    <option value="日本語">🇯🇵 日本語</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bước 6 -->
+            <div class="space-y-2">
+              <label class="block text-sm font-bold text-blue-700">Bước 6: Copy prompt for AI gen outline slide</label>
+              <button onclick="copyManualOutlinePrompt()"
+                      class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+                <span id="manualCopyOutlineBtnText">&#128203; Copy Prompt Tạo Outline</span>
+              </button>
+            </div>
+
+            <!-- Bước 7 -->
+            <div class="space-y-2">
+              <label class="block text-sm font-bold text-blue-700">Bước 7: Dán outline JSON và tạo slide</label>
+              <p class="text-xs text-slate-500">Dán JSON outline từ AI vào đây và bấm tạo slide.</p>
+              <textarea id="manualOutlineInput" rows="8"
+                        placeholder='[ { "layout_index": 0, "title": "...", "placeholders": [...] } ]'
+                        class="w-full border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"></textarea>
+              <button id="manualGenerateBtn" onclick="generateManualPptx()"
+                      class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md">
+                <span id="manualGenerateBtnText">Tạo Slide</span>
+              </button>
+              <div id="manualGenerateStatus" class="hidden text-sm rounded-lg px-4 py-3"></div>
+              <a id="manualDownloadLink" href="#" download
+                 class="hidden w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+                Download PowerPoint
+              </a>
+            </div>
+
+          </div>
+        </div>
       </div>
-    </section>
 
-    <!-- STEP 2 -->
-    <section id="section2" class="step-section hidden-step space-y-5">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
-        <h2 class="text-base font-semibold text-slate-700">Step 2  Paste the AI JSON Response</h2>
-        <p class="text-sm text-slate-500">Open your AI assistant, paste the copied prompt, then paste the AI reply below.</p>
-
-        <div class="flex flex-wrap gap-2">
-          <a href="https://gemini.google.com" target="_blank"
-             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-xs font-medium rounded-lg border border-slate-200 transition-colors">
-             Gemini
-          </a>
-          <a href="https://grok.x.ai" target="_blank"
-             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-xs font-medium rounded-lg border border-slate-200 transition-colors">
-             Grok
-          </a>
-          <a href="https://chat.openai.com" target="_blank"
-             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-xs font-medium rounded-lg border border-slate-200 transition-colors">
-             ChatGPT
-          </a>
-        </div>
-
-        <textarea id="aiJsonInput" rows="12"
-                  placeholder='Paste the AI response here. Expected format:
-[
-  {
-    "layout_index": 0,
-    "placeholders": { "0": "Title", "1": "Subtitle" }
-  }
-]'
-                  class="w-full border border-slate-200 rounded-xl p-4 text-sm font-mono text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none transition"></textarea>
-
-        <div id="jsonValidation" class="hidden text-sm rounded-lg px-4 py-2"></div>
-
-        <div class="flex gap-3">
-          <button onclick="goToStep1()"
-                  class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-colors">
-            &#8592; Back
-          </button>
-          <button onclick="validateAndProceed()"
-                  class="flex-[2] py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors">
-            Validate &amp; Continue &#8594;
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- STEP 3 -->
-    <section id="section3" class="step-section hidden-step space-y-5">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-5">
-        <h2 class="text-base font-semibold text-slate-700">Step 3  Generate your PowerPoint</h2>
-
-        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm space-y-1">
-          <p class="font-semibold text-blue-700">Ready to generate</p>
-          <p class="text-slate-600">Master file: <span id="summaryFile" class="font-medium text-slate-800"></span></p>
-          <p class="text-slate-600">Slides in JSON: <span id="summarySlides" class="font-medium text-slate-800"></span></p>
-        </div>
-
-        <details class="group">
-          <summary class="cursor-pointer select-none text-sm font-medium text-slate-500 hover:text-blue-600 flex items-center gap-1 list-none">
-            <svg class="w-4 h-4 transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-            Preview JSON
-          </summary>
-          <pre id="jsonPreview" class="mt-3 bg-slate-900 text-emerald-300 text-xs rounded-xl p-4 overflow-auto max-h-56 whitespace-pre-wrap break-words"></pre>
-        </details>
-
-        <button id="generateBtn" onclick="generatePptx()"
-                class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
-          </svg>
-          <span id="generateBtnText">Generate Final PowerPoint</span>
-        </button>
-
-        <div id="generateStatus" class="hidden text-sm rounded-lg px-4 py-3"></div>
-
-        <a id="downloadLink" href="#" download
-           class="hidden w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 4v12m0 0l-4-4m4 4 4-4"/><path d="M4 20h16"/>
-          </svg>
-          Download PowerPoint
-        </a>
-
-        <button onclick="goToStep2()"
-                class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-xl transition-colors text-sm">
-          &#8592; Back to Step 2
-        </button>
-      </div>
+      <!-- End of sections -->
     </section>
 
   </main>
-
-  <!-- Edit Layout Modal -->
-  <div id="editModal"
-       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm hidden"
-       onclick="closeEditModalOutside(event)">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-        <h3 class="font-bold text-slate-800">Chỉnh sửa cấu trúc Layout</h3>
-        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-700 transition-colors bg-transparent border-0 cursor-pointer">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-
-      <div class="px-6 py-3 bg-amber-50 border-b border-amber-100">
-        <p class="text-xs text-amber-700">⚠&#xfe0f; Chỉnh sửa trực tiếp cấu trúc JSON layout. Thay đổi sẽ ảnh hưởng đến prompt AI và được lưu trên server.</p>
-      </div>
-
-      <div class="flex-1 overflow-hidden px-6 py-4">
-        <textarea id="editModalJson" spellcheck="false"
-                  class="w-full h-80 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none overflow-auto"></textarea>
-        <div id="editModalError" class="hidden mt-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></div>
-      </div>
-
-      <div class="px-6 pb-5 flex gap-3">
-        <button onclick="closeEditModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-colors text-sm">Hủy</button>
-        <button onclick="resetLayoutFromServer()" class="flex-1 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold rounded-xl transition-colors text-sm">Khôi phục gốc</button>
-        <button onclick="saveLayoutEdits()" id="saveLayoutBtn" class="flex-[2] py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
-          <span id="saveLayoutBtnText">Lưu thay đổi</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast -->
   <div id="toast"
@@ -449,56 +307,12 @@
 
   <script>
     /*  State  */
-    let currentStep = 1;
     let layoutData = null;
     let uploadedFilename = "";
-    let validatedJson = null;
-    let useBuiltinProfile = false;
     let selectedBuiltinId = null;
     let builtinLayoutSchema = null;
     let schemaPromptTemplate = "";  // raw template with {filename} placeholder
     let manualUploadedFilename = "";  // pptx uploaded in manual mode
-
-    /*  Step navigation  */
-    function showStep(step) {
-      [1, 2, 3].forEach(n => {
-        const sec    = document.getElementById('section' + n);
-        const circle = document.getElementById('stepCircle' + n);
-        const label  = document.getElementById('stepLabel' + n);
-        const line   = document.getElementById('line' + n);
-        if (n === step) {
-          sec.classList.remove('hidden-step');
-          circle.className = 'w-9 h-9 rounded-full bg-blue-600 text-white text-sm font-bold flex items-center justify-center shadow-md transition-all duration-300';
-          circle.textContent = n;
-          label.className  = 'text-sm font-semibold text-blue-600 hidden sm:inline';
-        } else if (n < step) {
-          sec.classList.add('hidden-step');
-          circle.className = 'w-9 h-9 rounded-full bg-emerald-500 text-white text-sm font-bold flex items-center justify-center transition-all duration-300';
-          circle.textContent = '\u2713';
-          label.className  = 'text-sm font-semibold text-emerald-600 hidden sm:inline';
-          if (line) line.classList.add('done');
-        } else {
-          sec.classList.add('hidden-step');
-          circle.className = 'w-9 h-9 rounded-full bg-slate-200 text-slate-500 text-sm font-bold flex items-center justify-center transition-all duration-300';
-          circle.textContent = n;
-          label.className  = 'text-sm font-semibold text-slate-400 hidden sm:inline';
-          if (line) line.classList.remove('done');
-        }
-      });
-      currentStep = step;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function goToStep1() { showStep(1); }
-    function goToStep2() { showStep(2); }
-    function goToStep3() {
-      document.getElementById('summaryFile').textContent   = useBuiltinProfile ? 'VTI Japan Profile (built-in)' : uploadedFilename;
-      document.getElementById('summarySlides').textContent = Array.isArray(validatedJson) ? validatedJson.length : '';
-      document.getElementById('jsonPreview').textContent   = JSON.stringify(validatedJson, null, 2);
-      document.getElementById('downloadLink').classList.add('hidden');
-      document.getElementById('generateStatus').classList.add('hidden');
-      showStep(3);
-    }
 
     /*  Toast  */
     let toastTimer;
@@ -514,316 +328,109 @@
       toastTimer = setTimeout(function() { t.style.opacity = '0'; t.style.pointerEvents = 'none'; }, duration);
     }
 
-    /*  Drag & Drop  */
-    function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
-    function handleDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
-    function handleDrop(e) {
-      e.preventDefault();
-      document.getElementById('dropZone').classList.remove('drag-over');
-      var file = e.dataTransfer.files[0];
-      if (file) applyFile(file);
-    }
-    function handleFileSelect(e) { var file = e.target.files[0]; if (file) applyFile(file); }
-    function applyFile(file) {
-      if (!file.name.toLowerCase().endsWith('.pptx')) { showToast('Only .pptx files are supported.', '\u2715'); return; }
-      document.getElementById('fileName').textContent = file.name;
-      document.getElementById('filePill').classList.remove('hidden');
-      document.getElementById('filePill').classList.add('flex');
-      document.getElementById('uploadBtn').disabled = false;
-      var dt = new DataTransfer();
-      dt.items.add(file);
-      document.getElementById('pptxFile').files = dt.files;
-    }
-    function resetFile() {
-      document.getElementById('pptxFile').value = '';
-      document.getElementById('filePill').classList.add('hidden');
-      document.getElementById('filePill').classList.remove('flex');
-      document.getElementById('uploadBtn').disabled = true;
-      document.getElementById('layoutResult').classList.add('hidden');
-      document.getElementById('uploadStatus').classList.add('hidden');
-    }
-
-    /*  Step 1: Upload  */
-    async function uploadFile() {
-      var input  = document.getElementById('pptxFile');
-      var btn    = document.getElementById('uploadBtn');
-      var status = document.getElementById('uploadStatus');
-      if (!input.files.length) return;
-      var formData = new FormData();
-      formData.append('file', input.files[0]);
-      btn.disabled = true;
-      document.getElementById('uploadBtnText').innerHTML = '<span class="spinner"></span>&nbsp;Scanning\u2026';
-      status.className = 'text-sm text-slate-400';
-      status.textContent = '';
-      status.classList.remove('hidden');
-      try {
-        var res  = await fetch('/upload_master', { method: 'POST', body: formData });
-        var data = await res.json();
-        if (!res.ok) { setUploadError(data.error || 'Upload failed.'); return; }
-        layoutData       = data.layouts;
-        uploadedFilename = data.filename;
-        if (data.layouts && data.layouts.length > 0) {
-          renderLayoutTable(data);
-          document.getElementById('layoutResult').classList.remove('hidden');
-          status.textContent = '\u2714  ' + data.total_layouts + ' layout(s) loaded.';
-        } else {
-          status.textContent = '\u2714  File uploaded. No schema yet — use “Import Schema AI” to add layout mapping.';
-        }
-        status.className   = 'text-sm text-emerald-600';
-      } catch (err) {
-        setUploadError('Network error: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        document.getElementById('uploadBtnText').textContent = 'Upload PPTX';
-      }
-    }
-    function setUploadError(msg) {
-      var s = document.getElementById('uploadStatus');
-      s.textContent = msg; s.className = 'text-sm text-red-500'; s.classList.remove('hidden');
-    }
-
-    /*  Render layout accordion  */
-    function renderLayoutTable(data) {
-      document.getElementById('layoutSummary').textContent = data.total_layouts + ' layout(s) in "' + data.filename + '"';
-      var container = document.getElementById('layoutAccordion');
-      container.innerHTML = '';
-
-      data.layouts.forEach(function(layout) {
-        var wrap = document.createElement('details');
-        wrap.className = 'bg-slate-50 border border-slate-200 rounded-xl overflow-hidden';
-        var summary = document.createElement('summary');
-        summary.className = 'px-4 py-2.5 cursor-pointer select-none flex items-center justify-between text-sm font-medium text-slate-700 hover:bg-blue-50 transition-colors list-none';
-        summary.innerHTML =
-          '<span><span class="inline-block w-6 h-6 rounded-md bg-blue-100 text-blue-700 text-xs font-bold text-center leading-6 mr-2">' + layout.layout_index + '</span>' + escapeHtml(layout.layout_name) + '</span>' +
-          '<span class="text-xs text-slate-400">' + layout.placeholders.length + ' placeholder' + (layout.placeholders.length !== 1 ? 's' : '') + ' \u25be</span>';
-        wrap.appendChild(summary);
-        if (layout.placeholders.length) {
-          var tw = document.createElement('div'); tw.className = 'px-4 pb-3';
-          var tbl = document.createElement('table'); tbl.className = 'w-full text-xs border-collapse';
-          var headerCols = '<th class="text-left py-1.5 pr-3 text-slate-500 font-semibold w-10">idx</th>' +
-            '<th class="text-left py-1.5 pr-3 text-slate-500 font-semibold">Name</th>' +
-            '<th class="text-left py-1.5 text-slate-500 font-semibold">Type</th>';
-          tbl.innerHTML = '<thead><tr class="border-b border-slate-200">' + headerCols + '</tr></thead>';
-          var tbody = document.createElement('tbody');
-          layout.placeholders.forEach(function(ph) {
-            var tr = document.createElement('tr'); tr.className = 'border-b border-slate-100 last:border-0';
-            var cells = '<td class="py-1.5 pr-3 text-slate-400">' + ph.idx + '</td>' +
-              '<td class="py-1.5 pr-3 font-mono text-slate-700">' + escapeHtml(ph.name) + '</td>' +
-              '<td class="py-1.5"><span class="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-xs font-medium">' + escapeHtml(ph.type || ph.ph_type || '') + '</span></td>';
-            tr.innerHTML = cells;
-            tbody.appendChild(tr);
-          });
-          tbl.appendChild(tbody); tw.appendChild(tbl); wrap.appendChild(tw);
-        } else {
-          var empty = document.createElement('p'); empty.className = 'px-4 pb-3 text-xs text-slate-400'; empty.textContent = 'No placeholders defined.'; wrap.appendChild(empty);
-        }
-        container.appendChild(wrap);
-      });
-    }
-
     function escapeHtml(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    /*  Build AI Prompt  */
-    function buildAIPrompt() {
-      var layoutJson = JSON.stringify(layoutData, null, 2);
-      var topic    = (document.getElementById('slideTopic').value   || '').trim();
-      var count    = parseInt(document.getElementById('slideCount').value, 10) || 7;
-      var language = document.getElementById('slideLanguage').value || 'Tiếng Việt';
-
-      if (!topic) {
-        showToast('Vui lòng nhập nội dung / chủ đề trước khi copy prompt.', '\u26a0', 3000);
-        document.getElementById('slideTopic').focus();
-        return null;
-      }
-
-      return 'You are a PowerPoint slide content generator.\n\n' +
-        '== PRESENTATION REQUIREMENTS ==\n' +
-        'Topic / Content   : ' + topic + '\n' +
-        'Number of slides  : ' + count + '\n' +
-        'Slide language    : ' + language + '\n\n' +
-        '== MASTER LAYOUT STRUCTURE ==\n' +
-        'Below is the layout structure extracted from the PowerPoint Master file.\n' +
-        'Each layout has an index, a name, and placeholders (idx, name, type).\n' +
-        layoutJson + '\n\n' +
-        '== YOUR TASK ==\n' +
-        'Generate exactly ' + count + ' slides about the topic above.\n' +
-        'All text content MUST be written in: ' + language + '.\n\n' +
-        'Strict rules:\n' +
-        '1. Return ONLY a valid JSON array — no markdown, no explanation, no code fences.\n' +
-        '2. The array must contain exactly ' + count + ' slide objects.\n' +
-        '3. Each slide object must have:\n' +
-        '   - "layout_index": (integer) index of the layout to use\n' +
-        '   - "title": short slide title (string)\n' +
-        '   - "placeholders": array of objects, each with:\n' +
-        '       { "id": <placeholder idx as integer>, "content": <string or string[]>, "type": "text" | "list" }\n' +
-        '4. For bullet-point content use type "list" with content as a string array.\n' +
-        '5. For plain text use type "text" with content as a string.\n' +
-        '6. Choose layouts intelligently (e.g., layout 0 for title slide, others for content).\n\n' +
-        '== EXAMPLE OUTPUT (2 slides) ==\n' +
-        '[\n' +
-        '  {\n' +
-        '    "layout_index": 0,\n' +
-        '    "title": "Tiêu đề bài thuyết trình",\n' +
-        '    "placeholders": [\n' +
-        '      { "id": 0, "content": "Tiêu đề bài thuyết trình", "type": "text" },\n' +
-        '      { "id": 1, "content": "Tên tác giả • Ngày tháng", "type": "text" }\n' +
-        '    ]\n' +
-        '  },\n' +
-        '  {\n' +
-        '    "layout_index": 1,\n' +
-        '    "title": "Nội dung chính",\n' +
-        '    "placeholders": [\n' +
-        '      { "id": 0, "content": "Nội dung chính", "type": "text" },\n' +
-        '      { "id": 1, "content": ["Điểm 1", "Điểm 2", "Điểm 3"], "type": "list" }\n' +
-        '    ]\n' +
-        '  }\n' +
-        ']\n\n' +
-        'Now generate all ' + count + ' slides in ' + language + '. Return ONLY the JSON array.';
+    /*  Built-in Step 5  */
+    function showBuiltinStep5() {
+      document.getElementById('bStep5').classList.remove('hidden');
+      document.getElementById('builtinOutlineInput').focus();
     }
 
-    function copyPrompt() {
-      if (!layoutData) return;
-      var prompt = buildAIPrompt();
-      if (!prompt) return;  // topic was empty — toast already shown
-      var btn = document.getElementById('copyBtnText');
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(prompt).then(function() {
-          btn.textContent = 'Copied!';
-          showToast('Prompt copied to clipboard!');
-          setTimeout(function() { btn.textContent = 'Copy Prompt for AI'; }, 2500);
-        });
-      } else {
-        var ta = document.createElement('textarea');
-        ta.value = prompt; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-        btn.textContent = 'Copied!';
-        showToast('Prompt copied to clipboard!');
-        setTimeout(function() { btn.textContent = 'Copy Prompt for AI'; }, 2500);
-      }
-    }
+    async function generateBuiltinPptx() {
+      var raw = document.getElementById('builtinOutlineInput').value.trim();
+      var status = document.getElementById('builtinGenerateStatus');
+      var dl = document.getElementById('builtinDownloadLink');
+      var btn = document.getElementById('builtinGenerateBtn');
 
-    /*  Step 2: Validate  */
-    function validateAndProceed() {
-      var raw    = document.getElementById('aiJsonInput').value.trim();
-      var banner = document.getElementById('jsonValidation');
       if (!raw) {
-        banner.textContent = '\u26a0  Please paste the AI response before continuing.';
-        banner.className   = 'text-sm rounded-lg px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200';
-        banner.classList.remove('hidden'); return;
+        status.textContent = '\u26a0 Vui lòng dán JSON outline trước khi tạo slide.';
+        status.className = 'text-sm rounded-lg px-4 py-3 bg-amber-50 text-amber-700 border border-amber-200';
+        status.classList.remove('hidden');
+        return;
       }
-      var cleaned = raw.replace(/^```[a-z]*\n?/i, '').replace(/```\s*$/, '').trim();
-      try {
-        var parsed = JSON.parse(cleaned);
-        if (!Array.isArray(parsed)) throw new Error('Expected a JSON array.');
-        validatedJson = parsed;
-        banner.textContent = '\u2714  Valid JSON \u2014 ' + parsed.length + ' slide(s) ready.';
-        banner.className   = 'text-sm rounded-lg px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200';
-        banner.classList.remove('hidden');
-        setTimeout(function() { goToStep3(); }, 600);
-      } catch (err) {
-        banner.textContent = '\u2715  Invalid JSON: ' + err.message;
-        banner.className   = 'text-sm rounded-lg px-4 py-2 bg-red-50 text-red-700 border border-red-200';
-        banner.classList.remove('hidden');
-      }
-    }
 
-    /*  Step 3: Generate  */
-    async function generatePptx() {
-      var btn    = document.getElementById('generateBtn');
-      var status = document.getElementById('generateStatus');
-      var dl     = document.getElementById('downloadLink');
-      btn.disabled = true;
-      document.getElementById('generateBtnText').innerHTML = '<span class="spinner"></span>&nbsp;Generating\u2026';
-      status.classList.remove('hidden');
-      status.className   = 'text-sm rounded-lg px-4 py-3 bg-blue-50 text-blue-700 border border-blue-100';
-      status.textContent = 'Sending to server\u2026';
-      dl.classList.add('hidden');
+      var cleaned = raw.replace(/^```[a-z]*\n?/i, '').replace(/```\s*$/, '').trim();
+      var parsed;
       try {
-        var payload = { slides: validatedJson };
-        if (selectedBuiltinId) {
-          payload.builtin_id = selectedBuiltinId;
-        } else if (useBuiltinProfile) {
-          payload.mode = 'profile';
-        } else {
-          payload.filename = uploadedFilename;
-        }
+        parsed = JSON.parse(cleaned);
+        if (!Array.isArray(parsed)) throw new Error('Expected a JSON array.');
+      } catch (err) {
+        status.textContent = '\u2715 JSON không hợp lệ: ' + err.message;
+        status.className = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+        status.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      document.getElementById('builtinGenerateBtnText').innerHTML = '<span class="spinner"></span>&nbsp;Đang tạo slide\u2026';
+      status.classList.remove('hidden');
+      status.className = 'text-sm rounded-lg px-4 py-3 bg-blue-50 text-blue-700 border border-blue-100';
+      status.textContent = 'Đang gửi dữ liệu lên server\u2026';
+      dl.classList.add('hidden');
+
+      try {
+        var payload = { slides: parsed, builtin_id: selectedBuiltinId };
         var res = await fetch('/generate', {
-          method:  'POST',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify(payload)
+          body: JSON.stringify(payload)
         });
         if (res.ok) {
-          var blob  = await res.blob();
-          var url   = URL.createObjectURL(blob);
-          var cd    = res.headers.get('Content-Disposition') || '';
+          var blob = await res.blob();
+          var url = URL.createObjectURL(blob);
+          var cd = res.headers.get('Content-Disposition') || '';
           var match = cd.match(/filename="?([^"]+)"?/);
-          var name  = match ? match[1] : 'presentation.pptx';
+          var name = match ? match[1] : 'presentation.pptx';
           dl.href = url; dl.download = name; dl.classList.remove('hidden');
-          status.textContent = '\u2714  PowerPoint generated successfully!';
-          status.className   = 'text-sm rounded-lg px-4 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200';
-          showToast('Done! Click Download to save your file.', '\uD83C\uDF89', 4000);
+          status.textContent = '\u2714 Tạo slide thành công!';
+          status.className = 'text-sm rounded-lg px-4 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200';
+          showToast('Thành công! Bấm Download để tải file.', '\uD83C\uDF89', 4000);
         } else {
-          var data = await res.json().catch(function() { return { error: 'Unknown error.' }; });
-          status.textContent = '\u2715  ' + (data.error || 'Generation failed.');
-          status.className   = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+          var data = await res.json().catch(function() { return { error: 'Lỗi không xác định.' }; });
+          status.textContent = '\u2715 ' + (data.error || 'Tạo slide thất bại.');
+          status.className = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
         }
       } catch (err) {
-        status.textContent = 'Network error: ' + err.message;
-        status.className   = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+        status.textContent = 'Lỗi mạng: ' + err.message;
+        status.className = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
       } finally {
         btn.disabled = false;
-        document.getElementById('generateBtnText').textContent = 'Regenerate';
+        document.getElementById('builtinGenerateBtnText').textContent = 'Tạo lại Slide';
       }
     }
-
-    /* ════════════════════════════════════════════════════════════════
-       Saved Masters panel
-    ════════════════════════════════════════════════════════════════ */
-    var savedPanelOpen = false;
 
     /* ════════════════════════════════════════════════════════════════
        Mode switching (master vs built-in profile)
     ════════════════════════════════════════════════════════════════ */
     function setMode(mode) {
-      useBuiltinProfile = (mode === 'profile');
       selectedBuiltinId = null;
-      var uploadSection  = document.getElementById('uploadSection');
       var builtinSection = document.getElementById('builtinSection');
       var manualSection  = document.getElementById('manualSection');
-      var profileInfo    = document.getElementById('profileModeInfo');
       var btnBuiltin     = document.getElementById('modeBuiltinBtn');
       var btnManual      = document.getElementById('modeManualBtn');
       var activeClass    = 'py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-blue-600 text-white border-blue-600';
       var inactiveClass  = 'py-2.5 rounded-xl text-sm font-semibold border transition-colors bg-white text-slate-600 border-slate-200 hover:bg-slate-50';
 
       // Reset all
-      uploadSection.classList.add('hidden');
       builtinSection.classList.add('hidden');
       manualSection.classList.add('hidden');
-      profileInfo.classList.add('hidden');
       btnBuiltin.className = inactiveClass;
       btnManual.className  = inactiveClass;
 
-      if (mode === 'master') {
-        uploadSection.classList.remove('hidden');
-        if (uploadedFilename === '__profile__' || uploadedFilename === '__builtin__' || uploadedFilename === '__manual__') {
-          uploadedFilename = '';
-          layoutData = null;
-          document.getElementById('layoutResult').classList.add('hidden');
-        }
-      } else if (mode === 'builtin') {
+      if (mode === 'builtin') {
         builtinSection.classList.remove('hidden');
         btnBuiltin.className = activeClass;
+        ['bStep2','bStep3','bStep4','bStep5'].forEach(function(id){
+          document.getElementById(id).classList.add('hidden');
+        });
+        selectedBuiltinId = null;
         loadBuiltinMasters();
       } else if (mode === 'manual') {
         manualSection.classList.remove('hidden');
         btnManual.className = activeClass;
         loadPromptTemplate();
-      } else {
-        profileInfo.classList.remove('hidden');
-        initBuiltinMode();
       }
     }
 
@@ -851,22 +458,46 @@
       }
     }
 
-    function copySchemaPrompt() {
-      var text = document.getElementById('schemaPromptTextarea').value;
-      if (!text.trim()) { showToast('Prompt đang trống!', '\u26a0', 2000); return; }
+    async function copySchemaPrompt() {
+      var promptText = document.getElementById('schemaPromptTextarea').value;
+      if (!promptText.trim()) { showToast('Prompt đang trống!', '\u26a0', 2000); return; }
       var btn = document.getElementById('copySchemaPromptBtnText');
-      function onCopied() {
+      btn.innerHTML = '<span class="spinner"></span>&nbsp;Đang tải inventory…';
+
+      var inventoryText = '';
+      if (manualUploadedFilename) {
+        try {
+          var res = await fetch('/export_inventory/' + encodeURIComponent(manualUploadedFilename));
+          if (res.ok) {
+            inventoryText = await res.text();
+          }
+        } catch (e) { /* ignore — copy prompt without inventory */ }
+      }
+
+      var combined;
+      if (inventoryText && promptText.includes('{inventory}')) {
+        combined = promptText.replace(/\{inventory\}/g, inventoryText);
+      } else if (inventoryText) {
+        combined = promptText + '\n\n' + '='.repeat(65) + '\nLAYOUT INVENTORY (auto-extracted from PPTX)\n' + '='.repeat(65) + '\n' + inventoryText;
+      } else {
+        combined = promptText.replace(/\{inventory\}/g, '(inventory not available)');
+      }
+
+      function onCopied(withInventory) {
         btn.textContent = '\u2714 Đã copy!';
-        showToast('Prompt đã được copy!', '\uD83D\uDCCB', 2000);
-        setTimeout(function() { btn.textContent = '\uD83D\uDCCB Copy Prompt'; }, 2200);
+        var msg = withInventory
+          ? 'Prompt + inventory đã được copy! (' + inventoryText.split('\n').length + ' dòng)'
+          : 'Prompt đã được copy! (không tìm thấy inventory)';
+        showToast(msg, '\uD83D\uDCCB', 3000);
+        setTimeout(function() { btn.textContent = '\uD83D\uDCCB Copy Prompt'; }, 2500);
       }
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(onCopied);
+        navigator.clipboard.writeText(combined).then(function() { onCopied(!!inventoryText); });
       } else {
         var ta = document.createElement('textarea');
-        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        ta.value = combined; ta.style.position = 'fixed'; ta.style.opacity = '0';
         document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-        onCopied();
+        onCopied(!!inventoryText);
       }
     }
 
@@ -919,12 +550,28 @@
       document.getElementById('manualFilePill').classList.add('hidden');
       document.getElementById('manualFilePill').classList.remove('flex');
       document.getElementById('manualUploadBtn').disabled = true;
-      document.getElementById('manualSchemaArea').classList.add('hidden');
+      document.getElementById('mStep2').classList.add('hidden');
+      document.getElementById('mStep3').classList.add('hidden');
+      document.getElementById('mStep4').classList.add('hidden');
+      document.getElementById('mStep567').classList.add('hidden');
       manualUploadedFilename = '';
     }
     function toggleBuiltinFields() {
       var checked = document.getElementById('manualSaveBuiltin').checked;
       document.getElementById('builtinFields').classList.toggle('hidden', !checked);
+    }
+
+    function downloadInventory() {
+      if (!manualUploadedFilename) {
+        showToast('Vui lòng upload file PPTX trước.', '⚠', 3000);
+        return;
+      }
+      var link = document.createElement('a');
+      link.href = '/export_inventory/' + encodeURIComponent(manualUploadedFilename);
+      link.download = '';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     async function uploadManualPptx() {
@@ -959,8 +606,11 @@
         manualUploadedFilename = data.filename;
         status.textContent = '✔ Đã upload: ' + data.filename + ' (' + data.total_layouts + ' layouts detected)';
         status.className = 'text-xs mt-1 text-emerald-600';
-        document.getElementById('manualSchemaArea').classList.remove('hidden');
-        showToast('Upload thành công! Dán schema JSON vào ô bên dưới.', '✔');
+        injectFilenameIntoPrompt(data.filename);
+        document.getElementById('mStep2').classList.remove('hidden');
+        document.getElementById('mStep3').classList.remove('hidden');
+        document.getElementById('mStep2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        showToast('Upload thành công! Copy prompt ở bước 2 và gửi cho AI.', '✔');
       } catch (err) {
         status.textContent = 'Lỗi mạng: ' + err.message;
         status.className = 'text-xs mt-1 text-red-500';
@@ -978,6 +628,8 @@
       if (!rawSchema) {
         showToast('Vui lòng dán schema JSON vào ô text.', '⚠', 3000); return;
       }
+      // Strip markdown code fences if AI wrapped the JSON (e.g. ```json ... ```)
+      rawSchema = rawSchema.replace(/^```[a-zA-Z]*\s*/,'').replace(/\s*```\s*$/,'').trim();
       var parsedSchema;
       try {
         parsedSchema = JSON.parse(rawSchema);
@@ -1011,49 +663,15 @@
         // Update app state
         layoutData = merged.layouts;
         uploadedFilename = manualUploadedFilename;
-        renderLayoutTable({ filename: merged.filename || uploadedFilename, total_layouts: layoutData.length, layouts: layoutData.map(function(l) {
-          return {
-            layout_index: l.layout_index,
-            layout_name:  l.layout_name,
-            placeholders: (l.placeholders || []).map(function(p) { return { idx: p.idx, name: p.description || p.type, type: p.type }; })
-          };
-        }) });
-        document.getElementById('layoutResult').classList.remove('hidden');
 
         status.textContent = '✔ Import thành công! ' + layoutData.length + ' layouts.';
         status.className = 'text-xs mt-1 text-emerald-600';
-        showToast('Schema đã được import!', '✔');
+        showToast('Schema đã import! Tiếp tục bước 4-7 bên dưới.', '✔');
 
-        // Step 2 (optional): save as built-in
-        var saveBuiltin = document.getElementById('manualSaveBuiltin').checked;
-        if (saveBuiltin) {
-          var bName = document.getElementById('builtinName').value.trim();
-          var bId   = document.getElementById('builtinId').value.trim();
-          if (!bName) {
-            showToast('Vui lòng nhập tên template để lưu built-in.', '⚠', 3000);
-            return;
-          }
-          status.textContent = 'Lưu vào thư viện built-in…';
-          var res2 = await fetch('/save_as_builtin', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({
-              filename:     manualUploadedFilename,
-              builtin_id:   bId || null,
-              builtin_name: bName,
-              schema:       merged
-            })
-          });
-          var result2 = await res2.json();
-          if (!res2.ok) {
-            status.textContent = '✔ Import OK, nhưng lưu built-in thất bại: ' + (result2.error || '');
-            status.className = 'text-xs mt-1 text-amber-600';
-          } else {
-            status.textContent = '✔ Lưu thành công! Template "' + result2.builtin_name + '" (id: ' + result2.builtin_id + ') đã có trong thư viện.';
-            status.className = 'text-xs mt-1 text-emerald-600';
-            showToast('Template đã lưu vào thư viện!', '🎉', 3500);
-          }
-        }
+        // Reveal steps 4 and 5-7
+        document.getElementById('mStep4').classList.remove('hidden');
+        document.getElementById('mStep567').classList.remove('hidden');
+        document.getElementById('mStep4').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
       } catch (err) {
         status.textContent = 'Lỗi mạng: ' + err.message;
@@ -1061,6 +679,225 @@
       } finally {
         btn.disabled = false;
         document.getElementById('manualImportBtnText').textContent = '\u{1F916} Import Schema';
+      }
+    }
+
+    async function saveManualBuiltin() {
+      var bName = (document.getElementById('manualBuiltinName').value || '').trim();
+      var bId   = (document.getElementById('manualBuiltinId').value   || '').trim();
+      if (!bName) { showToast('Vui lòng nhập tên template.', '\u26a0', 3000); return; }
+      if (!manualUploadedFilename) { showToast('Không tìm thấy file PPTX đã upload.', '\u26a0', 3000); return; }
+      var btn = document.getElementById('saveBuiltinBtn');
+      var btnText = document.getElementById('saveBuiltinBtnText');
+      var statusEl = document.getElementById('saveBuiltinStatus');
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner"></span>&nbsp;Đang lưu\u2026';
+      try {
+        var schemaRes = await fetch('/schema/' + encodeURIComponent(manualUploadedFilename));
+        if (!schemaRes.ok) throw new Error('Không tìm thấy schema đã import.');
+        var schema = await schemaRes.json();
+        var res = await fetch('/save_as_builtin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: manualUploadedFilename, builtin_id: bId || null, builtin_name: bName, schema: schema })
+        });
+        var result = await res.json();
+        if (!res.ok) {
+          statusEl.textContent = '\u2715 ' + (result.error || 'Lưu thất bại.');
+          statusEl.className = 'text-xs mt-1 text-red-500';
+        } else {
+          statusEl.textContent = '\u2714 Đã lưu template "' + result.builtin_name + '" (id: ' + result.builtin_id + ')';
+          statusEl.className = 'text-xs mt-1 text-emerald-600';
+          showToast('Template đã lưu vào thư viện!', '\uD83C\uDF89', 3500);
+        }
+        statusEl.classList.remove('hidden');
+      } catch(e) {
+        statusEl.textContent = 'Lỗi: ' + e.message;
+        statusEl.className = 'text-xs mt-1 text-red-500';
+        statusEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = '\u{1F4BE} Lưu Template';
+      }
+    }
+
+    async function copyManualOutlinePrompt() {
+      if (!layoutData || !layoutData.length) {
+        showToast('Schema chưa được import.', '\u26a0', 3000); return;
+      }
+      var topic = (document.getElementById('manualSlideTopic').value || '').trim();
+      if (!topic) {
+        document.getElementById('manualSlideTopic').focus();
+        showToast('Nhập chủ đề bài thuyết trình trước.', '\u26a0', 3000); return;
+      }
+      var count = document.getElementById('manualSlideCount').value || '7';
+      var language = document.getElementById('manualSlideLanguage').value || 'Ti\u1EBFng Vi\u1EC7t';
+      var prompt = buildAIPrompt(topic, count, language);
+      if (!prompt) return;
+      var btnText = document.getElementById('manualCopyOutlineBtnText');
+      function onCopied() {
+        btnText.textContent = '\u2714 Đã copy!';
+        showToast('Prompt outline đã copy! Dán vào AI để tạo slide.', '\uD83D\uDCCB', 3000);
+        setTimeout(function() { btnText.textContent = '\uD83D\uDCCB Copy Prompt Tạo Outline'; }, 2500);
+      }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(prompt).then(onCopied);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = prompt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        onCopied();
+      }
+    }
+
+    async function generateManualPptx() {
+      var raw = document.getElementById('manualOutlineInput').value.trim();
+      var status = document.getElementById('manualGenerateStatus');
+      var dl = document.getElementById('manualDownloadLink');
+      var btn = document.getElementById('manualGenerateBtn');
+      var btnText = document.getElementById('manualGenerateBtnText');
+
+      if (!raw) {
+        showToast('Vui lòng dán JSON outline từ AI.', '⚠', 3000);
+        return;
+      }
+
+      var cleaned = raw.replace(/^```[a-z]*\n?/i, '').replace(/```\s*$/, '').trim();
+      var parsed;
+      try {
+        parsed = JSON.parse(cleaned);
+        if (!Array.isArray(parsed)) throw new Error('Expected a JSON array.');
+      } catch (err) {
+        status.textContent = '✕ Invalid JSON: ' + err.message;
+        status.className = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+        status.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner"></span>&nbsp;Đang tạo slide…';
+      status.classList.remove('hidden');
+      status.className = 'text-sm rounded-lg px-4 py-3 bg-blue-50 text-blue-700 border border-blue-100';
+      status.textContent = 'Đang gửi yêu cầu lên server…';
+      dl.classList.add('hidden');
+
+      try {
+        var payload = { slides: parsed, filename: manualUploadedFilename };
+        var res = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          var blob = await res.blob();
+          var url = URL.createObjectURL(blob);
+          var cd = res.headers.get('Content-Disposition') || '';
+          var match = cd.match(/filename="?([^"]+)"?/);
+          var name = match ? match[1] : 'presentation.pptx';
+          dl.href = url; dl.download = name; dl.classList.remove('hidden');
+          status.textContent = '✔ Tạo slide thành công!';
+          status.className = 'text-sm rounded-lg px-4 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200';
+          showToast('Tạo slide thành công! Bấm Download để tải về.', '🎉', 4000);
+        } else {
+          var data = await res.json().catch(function() { return { error: 'Unknown error.' }; });
+          status.textContent = '✕ ' + (data.error || 'Tạo slide thất bại.');
+          status.className = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+        }
+      } catch (err) {
+        status.textContent = 'Lỗi mạng: ' + err.message;
+        status.className = 'text-sm rounded-lg px-4 py-3 bg-red-50 text-red-700 border border-red-200';
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Tạo Slide';
+      }
+    }
+
+    function buildAIPrompt(topic, count, language) {
+      var layoutJson = JSON.stringify(layoutData, null, 2);
+      return 'You are a PowerPoint slide content generator.\n\n' +
+        '== PRESENTATION REQUIREMENTS ==\n' +
+        'Topic / Content   : ' + topic + '\n' +
+        'Number of slides  : ' + count + '\n' +
+        'Slide language    : ' + language + '\n\n' +
+        '== MASTER LAYOUT STRUCTURE ==\n' +
+        'Below is the layout structure extracted from the PowerPoint Master file.\n' +
+        'Each layout has an index, a name, and placeholders (idx, name, type).\n' +
+        layoutJson + '\n\n' +
+        '== YOUR TASK ==\n' +
+        'Generate exactly ' + count + ' slides about the topic above.\n' +
+        'All text content MUST be written in: ' + language + '.\n\n' +
+        'Strict rules:\n' +
+        '1. Return ONLY a valid JSON array — no markdown, no explanation, no code fences.\n' +
+        '2. The array must contain exactly ' + count + ' slide objects.\n' +
+        '3. Each slide object must have:\n' +
+        '   - "layout_index": (integer) index of the layout to use\n' +
+        '   - "title": short slide title (string)\n' +
+        '   - "placeholders": array of objects, each with:\n' +
+        '       { "id": <placeholder idx as integer>, "content": <string or string[]>, "type": "text" | "list" }\n' +
+        '4. For bullet-point content use type "list" with content as a string array.\n' +
+        '5. For plain text use type "text" with content as a string.\n' +
+        '6. Choose layouts intelligently (e.g., layout 0 for title slide, others for content).\n\n' +
+        '== EXAMPLE OUTPUT (2 slides) ==\n' +
+        '[\n' +
+        '  {\n' +
+        '    "layout_index": 0,\n' +
+        '    "title": "Tiêu đề bài thuyết trình",\n' +
+        '    "placeholders": [\n' +
+        '      { "id": 0, "content": "Tiêu đề bài thuyết trình", "type": "text" },\n' +
+        '      { "id": 1, "content": "Tên tác giả • Ngày tháng", "type": "text" }\n' +
+        '    ]\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "layout_index": 1,\n' +
+        '    "title": "Nội dung chính",\n' +
+        '    "placeholders": [\n' +
+        '      { "id": 0, "content": "Nội dung chính", "type": "text" },\n' +
+        '      { "id": 1, "content": ["Điểm 1", "Điểm 2", "Điểm 3"], "type": "list" }\n' +
+        '    ]\n' +
+        '  }\n' +
+        ']\n\n' +
+        'Now generate all ' + count + ' slides in ' + language + '. Return ONLY the JSON array.';
+    }
+
+    async function copyBuiltinPrompt() {
+      if (!layoutData || !layoutData.length) {
+        showToast('Vui lòng chọn master template trước.', '\u26a0', 3000); return;
+      }
+      var topic = (document.getElementById('builtinSlideTopic').value || '').trim();
+      if (!topic) {
+        document.getElementById('builtinSlideTopic').focus();
+        showToast('Nhập chủ đề bài thuyết trình trước.', '\u26a0', 3000); return;
+      }
+      var count = document.getElementById('builtinSlideCount').value || '7';
+      var language = document.getElementById('builtinSlideLanguage').value || 'Ti\u1EBFng Vi\u1EC7t';
+      var prompt = buildAIPrompt(topic, count, language);
+      if (!prompt) return;
+      var btnText = document.getElementById('copyBuiltinPromptBtnText');
+      function onCopied() {
+        btnText.textContent = '\u2714 Đã copy!';
+        showToast('Prompt đã copy! Dán vào AI để tạo outline slide.', '\uD83D\uDCCB', 3000);
+        setTimeout(function() { btnText.textContent = '\uD83D\uDCCB Copy Prompt'; }, 2500);
+      }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(prompt).then(onCopied);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = prompt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        onCopied();
+      }
+    }
+
+    async function deleteBuiltinMaster(id, name) {
+      if (!confirm('Xoá template "' + name + '"?\nFile JSON profile và PPTX trong master_slide/ sẽ bị xoá.')) return;
+      try {
+        var res = await fetch('/delete_builtin/' + encodeURIComponent(id), { method: 'DELETE' });
+        var data = await res.json();
+        if (!res.ok) { showToast('Lỗi: ' + (data.error || 'Xoá thất bại'), '\u2715', 4000); return; }
+        showToast('Đã xoá template "' + name + '"', '\uD83D\uDDD1', 2500);
+        loadBuiltinMasters();
+      } catch(e) {
+        showToast('Lỗi mạng: ' + e.message, '\u2715', 4000);
       }
     }
 
@@ -1114,6 +951,13 @@
           card.appendChild(nameEl);
           card.appendChild(meta);
           card.appendChild(badge);
+          var delBtn = document.createElement('button');
+          delBtn.className = 'mt-2 w-full py-1 text-xs font-medium bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-700 border border-red-200 rounded-lg transition-colors';
+          delBtn.textContent = '\uD83D\uDDD1 Xoá template';
+          (function(mid, mname) {
+            delBtn.onclick = function(e) { e.stopPropagation(); deleteBuiltinMaster(mid, mname); };
+          })(m.id, m.name || m.id);
+          card.appendChild(delBtn);
           list.appendChild(card);
         });
       } catch (err) {
@@ -1153,208 +997,20 @@
             })
           };
         });
-        renderLayoutTable({ filename: m.name, total_layouts: layoutData.length, layouts: layoutData });
-        document.getElementById('layoutResult').classList.remove('hidden');
-        statusEl.textContent = '✔ Đã tải ' + layoutData.length + ' layouts từ ' + m.name;
+        statusEl.textContent = '\u2714 Đã tải ' + layoutData.length + ' layouts từ ' + m.name + '. Tiếp tục điền thông tin bên dưới.';
         statusEl.className = 'text-xs text-emerald-600';
         statusEl.classList.remove('hidden');
+        document.getElementById('bStep2').classList.remove('hidden');
+        document.getElementById('bStep3').classList.remove('hidden');
+        document.getElementById('bStep4').classList.remove('hidden');
+        document.getElementById('bStep5').classList.remove('hidden');
+        document.getElementById('builtinOutlineInput').value = '';
+        document.getElementById('builtinGenerateStatus').classList.add('hidden');
+        document.getElementById('builtinDownloadLink').classList.add('hidden');
+        document.getElementById('bStep2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } catch (e) {
-        statusEl.textContent = '✕ Lỗi tải schema: ' + e.message;
+        statusEl.textContent = '\u2715 Lỗi tải schema: ' + e.message;
         statusEl.className = 'text-xs text-red-500';
-      }
-    }
-
-    async function initBuiltinMode() {
-      if (!builtinLayoutSchema) {
-        showToast('Vui lòng chọn một built-in master trước.', '\u26a0', 3000);
-        return;
-      }
-      var identity = builtinLayoutSchema.template_identity || builtinLayoutSchema.name || 'Built-in Template';
-      layoutData = builtinLayoutSchema.layouts.map(function(l) {
-        return {
-          layout_index: l.layout_index,
-          layout_name:  l.name,
-          placeholders: (l.placeholders || []).map(function(p) {
-            return { idx: p.idx, name: p.name, type: p.ph_type || 'BODY' };
-          })
-        };
-      });
-      renderLayoutTable({ filename: identity, total_layouts: layoutData.length, layouts: layoutData });
-      document.getElementById('layoutResult').classList.remove('hidden');
-      uploadedFilename = '__profile__';
-    }
-
-    function toggleSavedPanel() {
-      savedPanelOpen = !savedPanelOpen;
-      var panel   = document.getElementById('savedPanel');
-      var chevron = document.getElementById('savedPanelChevron');
-      if (savedPanelOpen) {
-        panel.classList.remove('hidden');
-        chevron.style.transform = 'rotate(180deg)';
-        loadSavedMasters();
-      } else {
-        panel.classList.add('hidden');
-        chevron.style.transform = '';
-      }
-    }
-
-    async function loadSavedMasters() {
-      var list  = document.getElementById('savedMastersList');
-      var badge = document.getElementById('masterBadge');
-      list.innerHTML = '<p class="px-6 py-4 text-sm text-slate-400">Đang tải\u2026</p>';
-      try {
-        var res  = await fetch('/list_masters');
-        var data = await res.json();
-        var masters = data.masters || [];
-        badge.textContent = masters.length;
-
-        if (masters.length === 0) {
-          list.innerHTML = '<p class="px-6 py-4 text-sm text-slate-400">Chưa có master nào được lưu.</p>';
-          return;
-        }
-
-        list.innerHTML = '';
-        masters.forEach(function(m) {
-          var row = document.createElement('div');
-          row.className = 'flex items-center justify-between px-6 py-3 hover:bg-slate-50 transition-colors';
-
-          var info = document.createElement('div');
-          info.className = 'flex-1 min-w-0';
-
-          var nameEl = document.createElement('p');
-          nameEl.className = 'text-sm font-medium text-slate-800 truncate';
-          nameEl.textContent = m.filename;
-
-          var meta = document.createElement('p');
-          meta.className = 'text-xs text-slate-400 mt-0.5';
-          meta.textContent = m.total_layouts + ' layouts · ' + (m.saved_at ? m.saved_at.replace('T', ' ') : '');
-          if (!m.pptx_exists) {
-            var warn = document.createElement('span');
-            warn.className = 'ml-2 text-amber-500';
-            warn.textContent = '(file PPTX không còn trên server)';
-            meta.appendChild(warn);
-          }
-
-          info.appendChild(nameEl);
-          info.appendChild(meta);
-
-          var btnLoad = document.createElement('button');
-          btnLoad.className = 'ml-3 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0';
-          btnLoad.textContent = 'Tải lại';
-          btnLoad.onclick = function() { loadMaster(m.filename); };
-
-          row.appendChild(info);
-          row.appendChild(btnLoad);
-          list.appendChild(row);
-        });
-      } catch (err) {
-        list.innerHTML = '<p class="px-6 py-4 text-sm text-red-500">Lỗi tải danh sách: ' + escapeHtml(err.message) + '</p>';
-      }
-    }
-
-    async function loadMaster(filename) {
-      try {
-        var res  = await fetch('/load_layout/' + encodeURIComponent(filename));
-        var data = await res.json();
-        if (!res.ok) { showToast(data.error || 'Không tải được layout.', '\u2715', 3000); return; }
-
-        layoutData       = data.layouts;
-        uploadedFilename = data.filename;
-        renderLayoutTable(data);
-        document.getElementById('layoutResult').classList.remove('hidden');
-
-        var s = document.getElementById('uploadStatus');
-        s.textContent = '\u2714  Đã tải layout từ bản lưu: ' + data.filename;
-        s.className   = 'text-sm text-emerald-600';
-        s.classList.remove('hidden');
-
-        // Close saved panel
-        savedPanelOpen = true; toggleSavedPanel();
-        showToast('Đã tải master: ' + filename);
-      } catch (err) {
-        showToast('Lỗi mạng: ' + err.message, '\u2715', 3000);
-      }
-    }
-
-    /* ════════════════════════════════════════════════════════════════
-       Edit Layout Modal
-    ════════════════════════════════════════════════════════════════ */
-    var _originalLayoutSnapshot = null;  // snapshot for "restore" button
-
-    function openEditModal() {
-      if (!layoutData) return;
-      _originalLayoutSnapshot = JSON.parse(JSON.stringify(layoutData));
-      document.getElementById('editModalJson').value = JSON.stringify(layoutData, null, 2);
-      document.getElementById('editModalError').classList.add('hidden');
-      document.getElementById('editModal').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeEditModal() {
-      document.getElementById('editModal').classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    function closeEditModalOutside(e) {
-      if (e.target === document.getElementById('editModal')) closeEditModal();
-    }
-
-    function resetLayoutFromServer() {
-      if (_originalLayoutSnapshot) {
-        document.getElementById('editModalJson').value = JSON.stringify(_originalLayoutSnapshot, null, 2);
-        document.getElementById('editModalError').classList.add('hidden');
-      }
-    }
-
-    async function saveLayoutEdits() {
-      var raw   = document.getElementById('editModalJson').value.trim();
-      var errEl = document.getElementById('editModalError');
-      var btn   = document.getElementById('saveLayoutBtn');
-      var btnTxt = document.getElementById('saveLayoutBtnText');
-
-      // Validate JSON
-      var parsed;
-      try {
-        parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) throw new Error('Phải là một mảng JSON.');
-      } catch (err) {
-        errEl.textContent = 'JSON không hợp lệ: ' + err.message;
-        errEl.classList.remove('hidden');
-        return;
-      }
-      errEl.classList.add('hidden');
-
-      btn.disabled = true;
-      btnTxt.innerHTML = '<span class="spinner"></span>&nbsp;Đang lưu\u2026';
-
-      try {
-        var res  = await fetch('/update_layout/' + encodeURIComponent(uploadedFilename), {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ layouts: parsed })
-        });
-        var data = await res.json();
-
-        if (!res.ok) {
-          errEl.textContent = data.error || 'Lưu thất bại.';
-          errEl.classList.remove('hidden');
-          return;
-        }
-
-        // Update in-memory state & re-render
-        layoutData = data.layouts;
-        renderLayoutTable(data);
-        closeEditModal();
-        showToast('Layout đã được lưu thành công!', '\u2714');
-        // Refresh badge if panel is open
-        if (savedPanelOpen) loadSavedMasters();
-
-      } catch (err) {
-        errEl.textContent = 'Lỗi mạng: ' + err.message;
-        errEl.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-        btnTxt.textContent = 'Lưu thay đổi';
       }
     }
 
@@ -1362,17 +1018,7 @@
        Init
     ════════════════════════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('aiJsonInput').addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.key === 'Enter') validateAndProceed();
-      });
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeEditModal();
-      });
-      // Pre-load badge count + prefetch layout schema silently
-      fetch('/list_masters').then(function(r) { return r.json(); }).then(function(d) {
-        var n = (d.masters || []).length;
-        document.getElementById('masterBadge').textContent = n;
-      }).catch(function() {});
+      setMode('builtin');
     });
   </script>
 </body>

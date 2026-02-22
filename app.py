@@ -312,6 +312,268 @@ def import_schema():
     return jsonify(saved)
 
 
+# ── /export_inventory/<filename> ────────────────────────────────────────────
+@app.route("/export_inventory/<path:filename>", methods=["GET"])
+def export_inventory(filename):
+    """
+    Generate a plain-text layout inventory for a master PPTX.
+    Each master block includes visual_theme (avg RGB color, luminosity tone,
+    accent1 color, recommended text color) so an external AI can distinguish
+    layouts that share the same name but belong to visually different masters.
+    User pastes this text into the AI schema-generation prompt.
+    """
+    safe_name = secure_filename(filename)
+    pptx_path = os.path.join(app.config["UPLOAD_FOLDER"], safe_name)
+    if not os.path.isfile(pptx_path):
+        return jsonify({"error": f"File '{filename}' not found."}), 404
+
+    try:
+        import io as _io
+        import colorsys
+        from pptx.enum.shapes import MSO_SHAPE_TYPE
+        from PIL import Image
+        from lxml import etree as _etree
+
+        prs = Presentation(pptx_path)
+        W = prs.slide_width
+        H = prs.slide_height
+
+        # ── helpers ───────────────────────────────────────────────────────────
+
+        def _get_bg_rgb(shape_list):
+            """
+            Scan shape_list for a fullscreen background PICTURE shape.
+            Returns (hex_color, brightness) or (None, None).
+            hex_color = average RGB of the image, e.g. '#1A57AD'
+            brightness = perceptual luminance 0-255
+            """
+            for shape in shape_list:
+                if shape.is_placeholder:
+                    continue
+                try:
+                    if shape.shape_type != MSO_SHAPE_TYPE.PICTURE:
+                        continue
+                    tol = 0.05
+                    if not (
+                        (shape.left   or 0) / W < tol and
+                        (shape.top    or 0) / H < tol and
+                        (shape.width  or 0) / W > 1 - tol and
+                        (shape.height or 0) / H > 1 - tol
+                    ):
+                        continue
+                    img = (
+                        Image.open(_io.BytesIO(shape.image.blob))
+                        .convert("RGB")
+                        .resize((80, 45))
+                    )
+                    pixels = list(img.getdata())
+                    r = sum(p[0] for p in pixels) // len(pixels)
+                    g = sum(p[1] for p in pixels) // len(pixels)
+                    b = sum(p[2] for p in pixels) // len(pixels)
+                    br = round((r * 299 + g * 587 + b * 114) / 1000)
+                    return f"#{r:02X}{g:02X}{b:02X}", br
+                except Exception:
+                    pass
+            return None, None
+
+        def _master_theme_clrs(master):
+            """
+            Extract dk1 / accent1 / lt1 from the per-master theme XML.
+            Returns dict e.g. {'dk1': '#000000', 'accent1': '#4472C4', 'lt1': '#FFFFFF'}
+            """
+            try:
+                for rel in master.part.rels.values():
+                    if "theme" in rel.reltype:
+                        theme_el = _etree.fromstring(rel.target_part.blob)
+                        cs = theme_el.find(".//" + qn("a:clrScheme"))
+                        if cs is None:
+                            return {}
+                        clrs = {}
+                        for child in cs:
+                            tag = child.tag.split("}")[-1] if "}" in child.tag else child.tag
+                            srgb  = child.find(qn("a:srgbClr"))
+                            sys_c = child.find(qn("a:sysClr"))
+                            if srgb is not None:
+                                clrs[tag] = f"#{srgb.get('val', '').upper()}"
+                            elif sys_c is not None:
+                                val = sys_c.get("lastClr", "")
+                                if val:
+                                    clrs[tag] = f"#{val.upper()}"
+                        return clrs
+            except Exception:
+                pass
+            return {}
+
+        def _visual_desc(hex_c, br, theme):
+            """
+            Convert avg color + brightness into a human-readable visual theme string.
+            Falls back to dk1 theme color if no background image was found.
+            Format: "<tone> <hue> | avg=<hex> | accent1=<hex> | use <white|dark> text"
+            """
+            if not hex_c or br is None:
+                dk1 = theme.get("dk1", "#808080")
+                try:
+                    r = int(dk1[1:3], 16)
+                    g = int(dk1[3:5], 16)
+                    b = int(dk1[5:7], 16)
+                    br    = round((r * 299 + g * 587 + b * 114) / 1000)
+                    hex_c = dk1
+                except Exception:
+                    return "unknown visual theme"
+            try:
+                r = int(hex_c[1:3], 16)
+                g = int(hex_c[3:5], 16)
+                b = int(hex_c[5:7], 16)
+                h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+                h_deg = round(h * 360)
+                s_pct = round(s * 100)
+                lum = (
+                    "very dark"  if br < 60  else
+                    "dark"       if br < 120 else
+                    "medium"     if br < 170 else
+                    "light"      if br < 220 else
+                    "very light"
+                )
+                hue = (
+                    "neutral"        if s_pct < 12 else
+                    "red"            if h_deg < 30  else
+                    "yellow/orange"  if h_deg < 75  else
+                    "green"          if h_deg < 165 else
+                    "blue"           if h_deg < 255 else
+                    "purple"         if h_deg < 290 else
+                    "pink"
+                )
+                rec     = "white text" if br < 140 else "dark text"
+                accent1 = theme.get("accent1", "?")
+                return f"{lum} {hue} | avg={hex_c} | accent1={accent1} | use {rec}"
+            except Exception:
+                return f"brightness={br}/255"
+
+        def _density_label(br):
+            """Return (density_str, br_str) from a brightness int or None."""
+            if br is None:  return "normal",       "N/A"
+            if br < 80:     return "title_only",   str(br)
+            if br < 160:    return "minimal_text",  str(br)
+            return "normal", str(br)
+
+        def _pos_label(l, t, w, h):
+            """Translate placeholder position (inches) to a readable layout label."""
+            parts = []
+            parts.append("header" if t < 1.5 else "footer" if t > 4.5 else "body")
+            parts.append(
+                "full-width" if w > 9  else
+                "left-col"   if l < 3  else
+                "right-col"  if l > 5  else
+                "center"
+            )
+            if h < 0.8: parts.append("1-line")
+            elif h > 3: parts.append("large")
+            return "+".join(parts)
+
+        # ── build inventory text ──────────────────────────────────────────────
+
+        stem          = os.path.splitext(safe_name)[0]
+        total_layouts = sum(len(m.slide_layouts) for m in prs.slide_masters)
+
+        lines = [
+            "=== COMPLETE LAYOUT INVENTORY ===",
+            "# Technical fields extracted directly from PPTX — do NOT change them.",
+            "# Your job: fill slide_role, use_for, content_guidance,",
+            "# per-placeholder description/content_hint/max_words, and example.",
+            "",
+            f"file: {stem}",
+            f"canvas: {round(W / 914400, 2)}\" x {round(H / 914400, 2)}\"",
+            f"total_masters: {len(prs.slide_masters)}",
+            f"total_layouts: {total_layouts}",
+            "",
+        ]
+
+        global_idx = 0
+        for mi, master in enumerate(prs.slide_masters):
+            theme = _master_theme_clrs(master)
+
+            # Try master shapes first; fall back to first layout shapes
+            master_hex, master_br = _get_bg_rgb(master.shapes)
+            if master_hex is None:
+                for layout in master.slide_layouts:
+                    master_hex, master_br = _get_bg_rgb(layout.shapes)
+                    if master_hex:
+                        break
+
+            visual = _visual_desc(master_hex, master_br, theme)
+            dk1    = theme.get("dk1",     "?")
+            acc    = theme.get("accent1", "?")
+            lt1    = theme.get("lt1",     "?")
+
+            lines += [
+                f"{'=' * 65}",
+                f"MASTER [{mi}] — {len(master.slide_layouts)} layouts",
+                f"  visual_theme: {visual}",
+                f"  theme: dk1={dk1}  accent1={acc}  lt1={lt1}",
+                "",
+            ]
+
+            for li, layout in enumerate(master.slide_layouts):
+                xml_type = layout.element.get("type", "custom")
+
+                layout_hex, layout_br = _get_bg_rgb(layout.shapes)
+                eff_br                = layout_br if layout_br is not None else master_br
+                density, br_str       = _density_label(eff_br)
+
+                if layout_hex and layout_hex != master_hex:
+                    bg_note = f"own bg: {layout_hex} (brightness={layout_br})"
+                else:
+                    bg_note = "inherits master background"
+
+                content_phs = []
+                for ph in layout.placeholders:
+                    idx = ph.placeholder_format.idx
+                    if idx in (10, 11, 12):
+                        continue
+                    tn = (
+                        ph.placeholder_format.type.name
+                        if ph.placeholder_format.type
+                        else "UNKNOWN"
+                    )
+                    l = round((ph.left   or 0) / 914400, 2)
+                    t = round((ph.top    or 0) / 914400, 2)
+                    w = round((ph.width  or 0) / 914400, 2)
+                    h = round((ph.height or 0) / 914400, 2)
+                    content_phs.append(
+                        f"    idx={idx} {tn} "
+                        f"left={l}\" top={t}\" w={w}\" h={h}\" "
+                        f"[{_pos_label(l, t, w, h)}]"
+                    )
+
+                lines += [
+                    f"  ┌─ layout_index={global_idx}"
+                    f"  master_index={mi}"
+                    f"  local_layout_index={li}",
+                    f"  │  name: \"{layout.name}\"  xml_type: {xml_type}",
+                    f"  │  background: {bg_note}",
+                    f"  │  text_density: {density}  (brightness={br_str}/255)",
+                    f"  │  content_placeholders ({len(content_phs)}):",
+                ]
+                for p in (content_phs or ["    (none)"]): lines.append(f"  │{p}")
+                lines += [
+                    f"  └─────────────────────────────────────────────────────────",
+                    "",
+                ]
+                global_idx += 1
+
+        text = "\n".join(lines)
+        buf  = _io.BytesIO(text.encode("utf-8"))
+        buf.seek(0)
+        return send_file(
+            buf,
+            as_attachment=True,
+            download_name=f"{stem}_layout_inventory.txt",
+            mimetype="text/plain",
+        )
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
+
+
 # ── /export_layout_previews/<filename> ───────────────────────────────────────
 @app.route("/export_layout_previews/<path:filename>", methods=["GET"])
 def export_layout_previews(filename):
@@ -532,6 +794,29 @@ def save_as_builtin():
         "pptx":        filename,
         "profile_path": profile_path,
     })
+
+
+# ── /delete_builtin/<id> ──────────────────────────────────────────────────────
+@app.route("/delete_builtin/<path:builtin_id>", methods=["DELETE"])
+def delete_builtin(builtin_id):
+    """Delete a built-in template: removes the JSON profile and its PPTX from master_slide/."""
+    safe_id = secure_filename(builtin_id)
+    profile_path = os.path.join(BUILTIN_PROFILES_DIR, f"{safe_id}.json")
+    if not os.path.isfile(profile_path):
+        return jsonify({"error": f"Template '{builtin_id}' not found."}), 404
+
+    with open(profile_path, "r", encoding="utf-8") as f:
+        profile = json.load(f)
+
+    os.remove(profile_path)
+
+    pptx_fname = profile.get("pptx", "")
+    if pptx_fname:
+        pptx_path = os.path.join(BUILTIN_MASTER_DIR, secure_filename(pptx_fname))
+        if os.path.isfile(pptx_path):
+            os.remove(pptx_path)
+
+    return jsonify({"ok": True, "deleted_id": safe_id})
 
 
 # ── XML-safe placeholder helpers ─────────────────────────────────────────────

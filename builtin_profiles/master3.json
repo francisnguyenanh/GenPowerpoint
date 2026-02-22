@@ -1,27 +1,36 @@
 {
   "id": "master3",
-  "name": "V3",
+  "name": "V31",
   "pptx": "master3.pptx",
-  "total_layouts": 9,
+  "total_layouts": 12,
   "canvas_size": {
     "height_inches": 7.5,
     "width_inches": 13.33
   },
-  "theme_colors": {},
+  "theme_colors": {
+    "accent1": "#4472C4",
+    "dark1": "#000000",
+    "light1": "#FFFFFF"
+  },
   "theme_fonts": {},
   "color_palette": {},
   "layouts": [
     {
-      "content_guidance": "Ghi tên khách hàng và tên dự án. Thường có thêm thông tin ngày tháng và phiên bản.",
+      "content_guidance": "Use a high-impact presentation title and a brief subtitle indicating the author or date.",
       "example": {
         "placeholders": [
           {
-            "content": "2021年03月19日\nVersion: 1.0",
+            "content": "Quarterly Business Review",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Operations Team | Q3 2026",
             "id": 1,
             "type": "text"
           }
         ],
-        "title": "ABC 様向け\nTEMPLATE PROPOSAL"
+        "title": "Quarterly Business Review"
       },
       "layout_index": 0,
       "layout_name": "Title Slide",
@@ -30,311 +39,459 @@
       "max_placeholders_to_fill": 2,
       "placeholders": [
         {
-          "content_hint": "Tên khách hàng + Proposal",
-          "description": "Tên dự án/Proposal",
-          "idx": 0,
-          "max_words": 15,
-          "type": "CENTER_TITLE"
-        },
-        {
-          "content_hint": "Ngày tháng và Version",
-          "description": "Thông tin phụ",
-          "idx": 1,
-          "max_words": 10,
-          "type": "SUBTITLE"
-        }
-      ],
-      "recommended_position": "first",
-      "slide_role": "cover",
-      "text_density": "title_only",
-      "use_for": "Trang bìa chính của bài thuyết trình."
-    },
-    {
-      "content_guidance": "Tiêu đề là AGENDA. Nội dung liệt kê từ 5-7 mục lớn có đánh số.",
-      "example": {
-        "placeholders": [
-          {
-            "content": [
-              "01 Executive Summary",
-              "02 Company Introduction",
-              "03 Proposal Summary"
-            ],
-            "id": 1,
-            "type": "list"
-          }
-        ],
-        "title": "AGENDA"
-      },
-      "layout_index": 1,
-      "layout_name": "Agenda Layout",
-      "local_layout_index": 1,
-      "master_index": 0,
-      "max_placeholders_to_fill": 2,
-      "placeholders": [
-        {
-          "content_hint": "AGENDA",
-          "description": "Tiêu đề trang",
-          "idx": 0,
-          "max_words": 5,
-          "type": "TITLE"
-        },
-        {
-          "content_hint": "Danh sách đánh số từ 01 đến 07",
-          "description": "Danh sách mục lục",
-          "idx": 1,
-          "max_words": null,
-          "type": "BODY"
-        }
-      ],
-      "recommended_position": "early",
-      "slide_role": "agenda",
-      "text_density": "normal",
-      "use_for": "Liệt kê danh mục các chương trong slide."
-    },
-    {
-      "content_guidance": "Chỉ ghi tên chương và số chương lớn. Text thường nằm giữa hoặc lệch phải tùy master.",
-      "example": {
-        "placeholders": [],
-        "title": "EXECUTIVE SUMMARY\n01"
-      },
-      "layout_index": 2,
-      "layout_name": "Section Header (Dark)",
-      "local_layout_index": 2,
-      "master_index": 0,
-      "max_placeholders_to_fill": 1,
-      "placeholders": [
-        {
-          "content_hint": "Tên chương viết hoa + Số thứ tự",
-          "description": "Tên chương",
-          "idx": 0,
-          "max_words": 10,
-          "type": "CENTER_TITLE"
-        }
-      ],
-      "recommended_position": "middle",
-      "slide_role": "section_divider",
-      "text_density": "title_only",
-      "use_for": "Ngắt chương với nền màu đậm hoặc hình ảnh lớn."
-    },
-    {
-      "content_guidance": "Tiêu đề nêu rõ ý chính. Body dùng bullet points.",
-      "example": {
-        "placeholders": [
-          {
-            "content": [
-              "Giải pháp tối ưu chi phí",
-              "Hệ thống vận hành ổn định"
-            ],
-            "id": 1,
-            "type": "list"
-          }
-        ],
-        "title": "1. Executive Summary"
-      },
-      "layout_index": 3,
-      "layout_name": "Title and Content",
-      "local_layout_index": 3,
-      "master_index": 0,
-      "max_placeholders_to_fill": 2,
-      "placeholders": [
-        {
-          "content_hint": "Tóm tắt nội dung slide",
-          "description": "Tiêu đề slide",
+          "content_hint": "Engaging 4-8 word title",
+          "description": "Main presentation title",
           "idx": 0,
           "max_words": 12,
           "type": "TITLE"
         },
         {
-          "content_hint": "3-5 bullet points",
-          "description": "Vùng nội dung chính",
+          "content_hint": "Presenter name and professional title",
+          "description": "Author, company name, or date",
           "idx": 1,
-          "max_words": null,
-          "type": "BODY"
+          "max_words": 20,
+          "type": "SUBTITLE"
         }
       ],
-      "recommended_position": "middle",
-      "slide_role": "content",
-      "text_density": "normal",
-      "use_for": "Layout nội dung chuẩn mực với tiêu đề và một vùng văn bản."
+      "recommended_position": "first",
+      "slide_role": "cover",
+      "text_density": "minimal_text",
+      "use_for": "Primary deck opening to introduce the presentation title and presenter details."
     },
     {
-      "content_guidance": "Điền thông tin định danh công ty: Tên, Ngày thành lập, Nhân sự.",
+      "content_guidance": "Provide a centered heading with a supporting descriptive subtitle.",
       "example": {
         "placeholders": [
           {
-            "content": "Company Name: VTI JOINT STOCK COMPANY\nEstablishment: 8/2017",
+            "content": "Market Analysis",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Deep dive into current industry trends and competitor movement.",
             "id": 1,
             "type": "text"
           }
         ],
-        "title": "COMPANY INTRODUCTION"
+        "title": "Market Analysis"
       },
-      "layout_index": 4,
-      "layout_name": "Company Intro - Info",
-      "local_layout_index": 4,
-      "master_index": 0,
+      "layout_index": 1,
+      "layout_name": "TITLE",
+      "local_layout_index": 0,
+      "master_index": 1,
       "max_placeholders_to_fill": 2,
       "placeholders": [
         {
-          "content_hint": "COMPANY INTRODUCTION",
-          "description": "Tiêu đề Introduction",
+          "content_hint": "Topic name",
+          "description": "Centered primary heading",
           "idx": 0,
-          "max_words": 5,
-          "type": "TITLE"
+          "max_words": 10,
+          "type": "CENTER_TITLE"
         },
         {
-          "content_hint": "Thông tin chi tiết công ty",
-          "description": "Bảng thông tin công ty",
+          "content_hint": "Short descriptive sentence",
+          "description": "Supporting context",
           "idx": 1,
-          "max_words": 100,
-          "type": "BODY"
+          "max_words": 15,
+          "type": "SUBTITLE"
         }
       ],
       "recommended_position": "early",
-      "slide_role": "content",
+      "slide_role": "cover",
       "text_density": "normal",
-      "use_for": "Giới thiệu thông tin pháp lý/cơ bản của công ty."
+      "use_for": "Secondary title or introductory slide for a specific deck segment."
     },
     {
-      "content_guidance": "Dùng cho các bảng so sánh Current State vs Future State.",
+      "content_guidance": "Keep points concise to maintain readability against the dark background.",
       "example": {
         "placeholders": [
           {
-            "content": [
-              "Tốn phí bảo trì",
-              "Khó mở rộng"
-            ],
-            "id": 1,
-            "type": "list"
+            "content": "Project Milestones",
+            "id": 0,
+            "type": "text"
           },
           {
             "content": [
-              "Tối ưu chi phí",
-              "Tự động scale"
+              "Phase 1: Research Complete",
+              "Phase 2: Prototype Development",
+              "Phase 3: User Testing"
             ],
-            "id": 2,
+            "id": 1,
             "type": "list"
           }
         ],
-        "title": "So sánh chi phí"
+        "title": "Project Milestones"
       },
-      "layout_index": 5,
-      "layout_name": "Two Content (Comparison)",
-      "local_layout_index": 5,
-      "master_index": 0,
-      "max_placeholders_to_fill": 3,
+      "layout_index": 2,
+      "layout_name": "OBJECT",
+      "local_layout_index": 0,
+      "master_index": 2,
+      "max_placeholders_to_fill": 2,
       "placeholders": [
         {
-          "content_hint": "Tên 2 đối tượng so sánh",
-          "description": "Tiêu đề so sánh",
+          "content_hint": "Key takeaway of the slide",
+          "description": "Slide heading",
           "idx": 0,
-          "max_words": 10,
+          "max_words": 8,
           "type": "TITLE"
         },
         {
-          "content_hint": "Đặc điểm nhóm 1",
-          "description": "Nội dung cột trái",
+          "content_hint": "3-5 concise bullet points",
+          "description": "Main content body",
           "idx": 1,
-          "max_words": null,
+          "max_words": 50,
           "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "minimal_text",
+      "use_for": "Standard content delivery focusing on bullet points or key data descriptions."
+    },
+    {
+      "content_guidance": "Use high-contrast text to signal a change in topic.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Section 2: Financials",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Revenue projections and budget allocation.",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Financial Outlook"
+      },
+      "layout_index": 3,
+      "layout_name": "TITLE",
+      "local_layout_index": 1,
+      "master_index": 2,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Chapter title",
+          "description": "Section name",
+          "idx": 0,
+          "max_words": 5,
+          "type": "CENTER_TITLE"
         },
         {
-          "content_hint": "Đặc điểm nhóm 2",
-          "description": "Nội dung cột phải",
-          "idx": 2,
-          "max_words": null,
+          "content_hint": "Brief summary of the coming section",
+          "description": "Sub-section or summary",
+          "idx": 1,
+          "max_words": 12,
+          "type": "SUBTITLE"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "section_divider",
+      "text_density": "title_only",
+      "use_for": "Transitioning between major chapters of the presentation."
+    },
+    {
+      "content_guidance": "Focus on a large impact statement in the title placeholder.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Customer Insights",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Based on the 2026 Annual Survey results.",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Customer Feedback"
+      },
+      "layout_index": 4,
+      "layout_name": "SECTION_HEADER",
+      "local_layout_index": 2,
+      "master_index": 2,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Main category name",
+          "description": "Large section title",
+          "idx": 0,
+          "max_words": 6,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Additional context or reference note",
+          "description": "Footer-area detail",
+          "idx": 1,
+          "max_words": 15,
+          "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "section_divider",
+      "text_density": "title_only",
+      "use_for": "Emphasis on a specific sub-topic or transitional statement."
+    },
+    {
+      "content_guidance": "Single headline slide for high visual impact.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Questions?",
+            "id": 0,
+            "type": "text"
+          }
+        ],
+        "title": "Thank You"
+      },
+      "layout_index": 5,
+      "layout_name": "Custom Layout",
+      "local_layout_index": 3,
+      "master_index": 2,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Brief announcement or category",
+          "description": "Main header",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "any",
+      "slide_role": "utility",
+      "text_density": "title_only",
+      "use_for": "Introductory or signage slide with minimal text requirements."
+    },
+    {
+      "content_guidance": "Standard title/subtitle layout on a light, neutral background.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Executive Summary",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "High-level overview of the strategic plan.",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Executive Summary"
+      },
+      "layout_index": 6,
+      "layout_name": "TITLE",
+      "local_layout_index": 0,
+      "master_index": 3,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Topic title",
+          "description": "Central heading",
+          "idx": 0,
+          "max_words": 10,
+          "type": "CENTER_TITLE"
+        },
+        {
+          "content_hint": "Descriptive subtitle",
+          "description": "Bottom context",
+          "idx": 1,
+          "max_words": 15,
+          "type": "SUBTITLE"
+        }
+      ],
+      "recommended_position": "early",
+      "slide_role": "cover",
+      "text_density": "normal",
+      "use_for": "Clean, light-themed title slide for internal segments."
+    },
+    {
+      "content_guidance": "Utilize for detailed lists, process steps, or core data points.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Key Objectives",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": [
+              "Increase revenue by 15%",
+              "Expand to new markets",
+              "Optimize internal workflows"
+            ],
+            "id": 1,
+            "type": "list"
+          }
+        ],
+        "title": "Key Objectives"
+      },
+      "layout_index": 7,
+      "layout_name": "OBJECT",
+      "local_layout_index": 1,
+      "master_index": 3,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Slide topic",
+          "description": "Top header",
+          "idx": 0,
+          "max_words": 8,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Detailed bullet points or text block",
+          "description": "Main content area",
+          "idx": 1,
+          "max_words": 60,
           "type": "BODY"
         }
       ],
       "recommended_position": "middle",
       "slide_role": "content",
       "text_density": "normal",
-      "use_for": "So sánh hai khía cạnh hoặc liệt kê hai cột song song."
+      "use_for": "Primary information delivery with high readability."
     },
     {
-      "content_guidance": "Tập trung vào các điều khoản Contract Type, Scope, Cost.",
+      "content_guidance": "A single header intended to reset the visual flow of the deck.",
       "example": {
         "placeholders": [
           {
-            "content": [
-              "Fixed Price",
-              "Phạm vi: Phát triển & Kiểm thử"
-            ],
-            "id": 1,
-            "type": "list"
+            "content": "Strategic Roadmap",
+            "id": 0,
+            "type": "text"
           }
         ],
-        "title": "1. Contract type and Scope"
-      },
-      "layout_index": 6,
-      "layout_name": "Contract/Legal Detail",
-      "local_layout_index": 6,
-      "master_index": 0,
-      "max_placeholders_to_fill": 2,
-      "placeholders": [
-        {
-          "content_hint": "CONTRACT / SCOPE",
-          "description": "Tiêu đề hợp đồng",
-          "idx": 0,
-          "max_words": 10,
-          "type": "TITLE"
-        },
-        {
-          "content_hint": "Các mục 1, 2, 3 về hợp đồng",
-          "description": "Chi tiết điều khoản",
-          "idx": 1,
-          "max_words": null,
-          "type": "BODY"
-        }
-      ],
-      "recommended_position": "late",
-      "slide_role": "content",
-      "text_density": "normal",
-      "use_for": "Trình bày chi tiết về loại hợp đồng, chi phí và phạm vi."
-    },
-    {
-      "content_guidance": "Không điền text. Layout này dùng để chèn thủ công các sơ đồ phức tạp.",
-      "example": {
-        "placeholders": [],
-        "title": ""
-      },
-      "layout_index": 7,
-      "layout_name": "Blank with Background",
-      "local_layout_index": 7,
-      "master_index": 0,
-      "max_placeholders_to_fill": 0,
-      "placeholders": [],
-      "recommended_position": "any",
-      "slide_role": "utility",
-      "text_density": "title_only",
-      "use_for": "Trang trống có nền để chèn hình ảnh minh họa lớn hoặc sơ đồ tự do."
-    },
-    {
-      "content_guidance": "Lời cảm ơn cuối cùng.",
-      "example": {
-        "placeholders": [],
-        "title": "THANK YOU!"
+        "title": "Roadmap 2026"
       },
       "layout_index": 8,
-      "layout_name": "Closing Slide",
-      "local_layout_index": 8,
-      "master_index": 0,
+      "layout_name": "1_Custom Layout",
+      "local_layout_index": 2,
+      "master_index": 3,
       "max_placeholders_to_fill": 1,
       "placeholders": [
         {
-          "content_hint": "THANK YOU",
-          "description": "Lời chào kết",
+          "content_hint": "Section title",
+          "description": "Centered title",
           "idx": 0,
-          "max_words": 5,
+          "max_words": 8,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "section_divider",
+      "text_density": "title_only",
+      "use_for": "Transition slide with a distinct dark background for visual break."
+    },
+    {
+      "content_guidance": "Use for a solitary point or a slide where visual media will be manually added.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Appendix A: Data Tables",
+            "id": 0,
+            "type": "text"
+          }
+        ],
+        "title": "Appendix"
+      },
+      "layout_index": 9,
+      "layout_name": "Custom Layout",
+      "local_layout_index": 3,
+      "master_index": 3,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Heading text",
+          "description": "Header",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "any",
+      "slide_role": "utility",
+      "text_density": "normal",
+      "use_for": "Clean utility slide for a single statement or large visual."
+    },
+    {
+      "content_guidance": "Top-aligned header with plenty of white space below for external graphics.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "North American Growth Patterns",
+            "id": 0,
+            "type": "text"
+          }
+        ],
+        "title": "Regional Growth"
+      },
+      "layout_index": 10,
+      "layout_name": "2_Custom Layout",
+      "local_layout_index": 4,
+      "master_index": 3,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Subject heading",
+          "description": "Header",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "minimal_text",
+      "use_for": "Mid-tone content slide for variety in visual texture."
+    },
+    {
+      "content_guidance": "Place concluding remarks and contact information here.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Get In Touch",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "contact@company.com",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Contact Information"
+      },
+      "layout_index": 11,
+      "layout_name": "TITLE",
+      "local_layout_index": 0,
+      "master_index": 4,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Thank you or Contact Us",
+          "description": "Closing header",
+          "idx": 0,
+          "max_words": 6,
           "type": "CENTER_TITLE"
+        },
+        {
+          "content_hint": "Email address or website",
+          "description": "Final detail",
+          "idx": 1,
+          "max_words": 12,
+          "type": "SUBTITLE"
         }
       ],
       "recommended_position": "last",
       "slide_role": "closing",
-      "text_density": "title_only",
-      "use_for": "Kết thúc bài thuyết trình."
+      "text_density": "normal",
+      "use_for": "Final closing slide or final topic introduction."
     }
   ],
   "schema_source": "manual",
-  "saved_at": "2026-02-21T11:56:38"
+  "saved_at": "2026-02-22T12:49:34"
 }
