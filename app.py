@@ -243,14 +243,19 @@ def upload_master():
 
 
 # ── /prompt_template ─────────────────────────────────────────────────────────
+# DEPRECATED: Use /ai_prompts instead. This route is kept for backward compatibility.
 @app.route("/prompt_template", methods=["GET"])
 def get_prompt_template():
-    """Return the saved prompt template (or the built-in default)."""
-    if os.path.isfile(PROMPT_TEMPLATE_PATH):
+    """
+    DEPRECATED: Fetch analyzer_prompt from ai_prompts.json instead.
+    Returns analyzer_prompt field for backward compatibility.
+    """
+    if os.path.isfile(AI_PROMPTS_PATH):
         try:
-            with open(PROMPT_TEMPLATE_PATH, "r", encoding="utf-8") as f:
+            with open(AI_PROMPTS_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            return jsonify(data)
+            if "analyzer_prompt" in data:
+                return jsonify({"template": data["analyzer_prompt"], "saved_at": data.get("saved_at")})
         except Exception:
             pass
     return jsonify({"template": DEFAULT_PROMPT_TEMPLATE, "saved_at": None})
@@ -258,38 +263,47 @@ def get_prompt_template():
 
 @app.route("/save_prompt_template", methods=["POST"])
 def save_prompt_template():
-    """Persist a user-edited prompt template to prompt_template.json."""
+    """
+    DEPRECATED: Use /save_ai_prompts instead. This route is kept for backward compatibility.
+    Persists analyzer_prompt to ai_prompts.json under the 'analyzer_prompt' field.
+    """
     body = request.get_json(silent=True)
     if not body or "template" not in body:
         return jsonify({"error": "'template' field required."}), 400
-    data = {
-        "template": body["template"],
-        "saved_at": datetime.datetime.now().isoformat(timespec="seconds"),
-    }
-    with open(PROMPT_TEMPLATE_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    return jsonify({"ok": True, "saved_at": data["saved_at"]})
+    # Load existing ai_prompts to merge
+    existing = {}
+    if os.path.isfile(AI_PROMPTS_PATH):
+        try:
+            with open(AI_PROMPTS_PATH, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        except Exception:
+            pass
+    existing["analyzer_prompt"] = body["template"]
+    existing["saved_at"] = datetime.datetime.now().isoformat(timespec="seconds")
+    with open(AI_PROMPTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(existing, f, ensure_ascii=False, indent=2)
+    return jsonify({"ok": True, "saved_at": existing["saved_at"]})
 
 
 # ── /ai_prompts ───────────────────────────────────────────────────────────────
 @app.route("/ai_prompts", methods=["GET"])
 def get_ai_prompts():
-    """Return saved AI prompt templates (topic + outline), or the defaults from ai_prompts.json."""
+    """Return saved AI prompt templates (topic, outline, analyzer) or defaults."""
     if os.path.isfile(AI_PROMPTS_PATH):
         try:
             with open(AI_PROMPTS_PATH, "r", encoding="utf-8") as f:
                 return jsonify(json.load(f))
         except Exception:
             pass
-    return jsonify({"topic_prompt": "", "outline_prompt": "", "saved_at": None})
+    return jsonify({"topic_prompt": "", "outline_prompt": "", "analyzer_prompt": "", "saved_at": None})
 
 
 @app.route("/save_ai_prompts", methods=["POST"])
 def save_ai_prompts():
     """Persist user-edited AI prompt templates to ai_prompts.json."""
     body = request.get_json(silent=True)
-    if not body or ("topic_prompt" not in body and "outline_prompt" not in body):
-        return jsonify({"error": "At least one of 'topic_prompt' or 'outline_prompt' required."}), 400
+    if not body or ("topic_prompt" not in body and "outline_prompt" not in body and "analyzer_prompt" not in body):
+        return jsonify({"error": "At least one of 'topic_prompt', 'outline_prompt', or 'analyzer_prompt' required."}), 400
     # Load existing to merge
     existing = {}
     if os.path.isfile(AI_PROMPTS_PATH):
@@ -302,6 +316,8 @@ def save_ai_prompts():
         existing["topic_prompt"] = body["topic_prompt"]
     if "outline_prompt" in body:
         existing["outline_prompt"] = body["outline_prompt"]
+    if "analyzer_prompt" in body:
+        existing["analyzer_prompt"] = body["analyzer_prompt"]
     existing["saved_at"] = datetime.datetime.now().isoformat(timespec="seconds")
     with open(AI_PROMPTS_PATH, "w", encoding="utf-8") as f:
         json.dump(existing, f, ensure_ascii=False, indent=2)

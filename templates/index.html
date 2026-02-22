@@ -475,10 +475,10 @@
     /* Prompt template helpers */
     async function loadPromptTemplate() {
       try {
-        var res = await fetch('/prompt_template');
+        var res = await fetch('/ai_prompts');
         if (!res.ok) return;
         var data = await res.json();
-        schemaPromptTemplate = data.template || '';
+        schemaPromptTemplate = data.analyzer_prompt || '';
         var fname = manualUploadedFilename || '{filename}';
         document.getElementById('schemaPromptTextarea').value =
           schemaPromptTemplate.replace(/\{filename\}/g, fname);
@@ -542,15 +542,15 @@
       var orig = btn.textContent;
       btn.textContent = 'Đang lưu…';
       try {
-        var res = await fetch('/save_prompt_template', {
+        var res = await fetch('/save_ai_prompts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ template: text })
+          body: JSON.stringify({ analyzer_prompt: text })
         });
         if (res.ok) {
           schemaPromptTemplate = text;
           btn.textContent = '\u2714 Đã lưu!';
-          showToast('Đã lưu template prompt!', '\u2714', 2000);
+          showToast('Đã lưu analyzer prompt!', '\u2714', 2000);
         } else {
           btn.textContent = '\u2715 Lỗi';
         }

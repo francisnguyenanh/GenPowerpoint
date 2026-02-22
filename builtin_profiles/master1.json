@@ -1,0 +1,709 @@
+{
+  "id": "master1",
+  "name": "V11",
+  "pptx": "master1.pptx",
+  "total_layouts": 17,
+  "canvas_size": {
+    "height_inches": 7.5,
+    "width_inches": 13.33
+  },
+  "theme_colors": {
+    "accent1": "#4472C4",
+    "dark1": "#000000",
+    "light1": "#FFFFFF"
+  },
+  "theme_fonts": {},
+  "color_palette": {},
+  "layouts": [
+    {
+      "content_guidance": "Use for high-level categorization. Keep text short and impactful against the dark blue background.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Q3 Strategic Growth",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Detailed Implementation Roadmap",
+            "id": 2,
+            "type": "text"
+          },
+          {
+            "content": "PART 02",
+            "id": 3,
+            "type": "text"
+          }
+        ],
+        "title": "PROJECT MILESTONES"
+      },
+      "layout_index": 0,
+      "layout_name": "SECTION_HEADER",
+      "local_layout_index": 0,
+      "master_index": 0,
+      "max_placeholders_to_fill": 3,
+      "placeholders": [
+        {
+          "content_hint": "Section Name (e.g., Phase 1: Discovery)",
+          "description": "Main section title",
+          "idx": 0,
+          "max_words": 8,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Supporting subtitle or timeline",
+          "description": "Secondary section header",
+          "idx": 2,
+          "max_words": 10,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Category or Numbering",
+          "description": "Left-aligned category label",
+          "idx": 3,
+          "max_words": 5,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "section_divider",
+      "text_density": "minimal_text",
+      "use_for": "Introducing a new major topic or phase within the presentation."
+    },
+    {
+      "content_guidance": "Keep the title concise as it sits at the top of a medium-blue background.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "2026 Fiscal Strategy & Operations",
+            "id": 0,
+            "type": "text"
+          }
+        ],
+        "title": "Annual Performance Review"
+      },
+      "layout_index": 1,
+      "layout_name": "Cover 4",
+      "local_layout_index": 1,
+      "master_index": 0,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Main Presentation Title",
+          "description": "Top-aligned presentation title",
+          "idx": 0,
+          "max_words": 12,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "first",
+      "slide_role": "cover",
+      "text_density": "minimal_text",
+      "use_for": "A modern, minimalist opening slide for the presentation."
+    },
+    {
+      "content_guidance": "The dark background requires high-contrast white text for the main title.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Global Expansion Strategy",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Prepared for the Executive Board | Feb 2026",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Market Entry Analysis"
+      },
+      "layout_index": 2,
+      "layout_name": "TITLE",
+      "local_layout_index": 2,
+      "master_index": 0,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Primary Subject",
+          "description": "Main centered title",
+          "idx": 0,
+          "max_words": 10,
+          "type": "CENTER_TITLE"
+        },
+        {
+          "content_hint": "Subtitle or Date/Author",
+          "description": "Sub-header or presenter info",
+          "idx": 1,
+          "max_words": 15,
+          "type": "SUBTITLE"
+        }
+      ],
+      "recommended_position": "first",
+      "slide_role": "cover",
+      "text_density": "title_only",
+      "use_for": "Standard title and subtitle configuration for the deck opening."
+    },
+    {
+      "content_guidance": "This layout is purely visual; no text placeholders available.",
+      "example": {
+        "placeholders": [],
+        "title": "Decorative Break"
+      },
+      "layout_index": 3,
+      "layout_name": "Cover 2",
+      "local_layout_index": 3,
+      "master_index": 0,
+      "max_placeholders_to_fill": 0,
+      "placeholders": [],
+      "recommended_position": "any",
+      "slide_role": "utility",
+      "text_density": "title_only",
+      "use_for": "A decorative separator or background-focused visual break."
+    },
+    {
+      "content_guidance": "Use this for manual insertion of charts or full-screen images.",
+      "example": {
+        "placeholders": [],
+        "title": "Visual Space"
+      },
+      "layout_index": 4,
+      "layout_name": "1_Custom Layout",
+      "local_layout_index": 0,
+      "master_index": 1,
+      "max_placeholders_to_fill": 0,
+      "placeholders": [],
+      "recommended_position": "any",
+      "slide_role": "utility",
+      "text_density": "minimal_text",
+      "use_for": "A clean, dark-blue blank slide for custom graphics or full-bleed images."
+    },
+    {
+      "content_guidance": "Add manual text boxes or shapes below the title header.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "North American Logistics Overview",
+            "id": 0,
+            "type": "text"
+          }
+        ],
+        "title": "Regional Distribution"
+      },
+      "layout_index": 5,
+      "layout_name": "Custom Layout",
+      "local_layout_index": 1,
+      "master_index": 1,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Slide Topic",
+          "description": "Top header",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "normal",
+      "use_for": "Generic content slide with a top title and light-blue background."
+    },
+    {
+      "content_guidance": "Use for succinct transitions between sub-topics.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Q1 Revenue Breakdown",
+            "id": 0,
+            "type": "text"
+          }
+        ],
+        "title": "Financial Results"
+      },
+      "layout_index": 6,
+      "layout_name": "TITLE",
+      "local_layout_index": 0,
+      "master_index": 2,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Short Section Title",
+          "description": "Centered transition title",
+          "idx": 0,
+          "max_words": 6,
+          "type": "CENTER_TITLE"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "section_divider",
+      "text_density": "minimal_text",
+      "use_for": "A mid-level section break with a single centered line of text."
+    },
+    {
+      "content_guidance": "No placeholders; intended for manual design elements.",
+      "example": {
+        "placeholders": [],
+        "title": "Manual Comparison"
+      },
+      "layout_index": 7,
+      "layout_name": "TWO_OBJECTS",
+      "local_layout_index": 1,
+      "master_index": 2,
+      "max_placeholders_to_fill": 0,
+      "placeholders": [],
+      "recommended_position": "any",
+      "slide_role": "utility",
+      "text_density": "minimal_text",
+      "use_for": "Decorative blue background slide with no preset placeholders."
+    },
+    {
+      "content_guidance": "Primary workhorse slide for detailed information.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Customer Feedback Analysis",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": [
+              "85% satisfaction rate",
+              "Improvement needed in UI",
+              "Mobile responsiveness is key"
+            ],
+            "id": 1,
+            "type": "list"
+          }
+        ],
+        "title": "Key Findings"
+      },
+      "layout_index": 8,
+      "layout_name": "OBJECT",
+      "local_layout_index": 2,
+      "master_index": 2,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Slide Subject",
+          "description": "Header title",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "5-7 Bullet points or large chart",
+          "description": "Full-width content area",
+          "idx": 1,
+          "max_words": 80,
+          "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "normal",
+      "use_for": "Standard content layout for bulleted lists or single large visuals."
+    },
+    {
+      "content_guidance": "Ideal for introducing major chapters with a brief explanatory sentence.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Supply Chain Efficiency",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "An overview of our logistics partners and internal processing times.",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Operations"
+      },
+      "layout_index": 9,
+      "layout_name": "SECTION_HEADER",
+      "local_layout_index": 3,
+      "master_index": 2,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Chapter Name",
+          "description": "Large centered title",
+          "idx": 0,
+          "max_words": 8,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Brief context for the section",
+          "description": "Lower summary text",
+          "idx": 1,
+          "max_words": 25,
+          "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "section_divider",
+      "text_density": "minimal_text",
+      "use_for": "Large-text section header with space for a summary description."
+    },
+    {
+      "content_guidance": "The right-side columns are split; use the top for a header and bottom for details.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Market Position",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Competitor A",
+            "id": 1,
+            "type": "text"
+          },
+          {
+            "content": [
+              "Price point leader",
+              "Limited geographic reach"
+            ],
+            "id": 2,
+            "type": "list"
+          }
+        ],
+        "title": "Competitive Landscape"
+      },
+      "layout_index": 10,
+      "layout_name": "TWO_OBJECTS_WITH_TEXT",
+      "local_layout_index": 4,
+      "master_index": 2,
+      "max_placeholders_to_fill": 3,
+      "placeholders": [
+        {
+          "content_hint": "Title",
+          "description": "Slide header",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Column Title",
+          "description": "Right-side column header",
+          "idx": 1,
+          "max_words": 5,
+          "type": "BODY"
+        },
+        {
+          "content_hint": "Column details/bullets",
+          "description": "Right-side main content",
+          "idx": 2,
+          "max_words": 40,
+          "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "normal",
+      "use_for": "Side-by-side comparison or layout with a dedicated right-hand sidebar."
+    },
+    {
+      "content_guidance": "The light theme provides high readability for detailed text.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Objectives and Key Results for 2026",
+            "id": 0,
+            "type": "text"
+          }
+        ],
+        "title": "Meeting Agenda"
+      },
+      "layout_index": 11,
+      "layout_name": "SECTION_HEADER",
+      "local_layout_index": 0,
+      "master_index": 3,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Section or Topic Title",
+          "description": "Upper-left title",
+          "idx": 0,
+          "max_words": 12,
+          "type": "TITLE"
+        }
+      ],
+      "recommended_position": "early",
+      "slide_role": "agenda",
+      "text_density": "normal",
+      "use_for": "Header slide with light background, suitable for agendas or checklists."
+    },
+    {
+      "content_guidance": "Use for internal or less formal presentations where a bright look is preferred.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Workflow Optimization",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Internal Process Improvement Team",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Internal Strategy Session"
+      },
+      "layout_index": 12,
+      "layout_name": "TITLE",
+      "local_layout_index": 1,
+      "master_index": 3,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Project Title",
+          "description": "Main title",
+          "idx": 0,
+          "max_words": 10,
+          "type": "CENTER_TITLE"
+        },
+        {
+          "content_hint": "Supporting text",
+          "description": "Sub-title",
+          "idx": 1,
+          "max_words": 15,
+          "type": "SUBTITLE"
+        }
+      ],
+      "recommended_position": "first",
+      "slide_role": "cover",
+      "text_density": "normal",
+      "use_for": "A light-themed alternative title slide."
+    },
+    {
+      "content_guidance": "Best for slides containing significant data or lengthy lists.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "System Requirements",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": [
+              "16GB RAM Minimum",
+              "500GB SSD Space",
+              "Windows 11 Compatible"
+            ],
+            "id": 1,
+            "type": "list"
+          }
+        ],
+        "title": "Technical Specs"
+      },
+      "layout_index": 13,
+      "layout_name": "OBJECT",
+      "local_layout_index": 2,
+      "master_index": 3,
+      "max_placeholders_to_fill": 2,
+      "placeholders": [
+        {
+          "content_hint": "Topic Title",
+          "description": "Standard header",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Detailed notes or chart",
+          "description": "Large content area",
+          "idx": 1,
+          "max_words": 100,
+          "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "normal",
+      "use_for": "Primary text/content slide with high readability for dense info."
+    },
+    {
+      "content_guidance": "Perfect for Pros/Cons or Before/After comparisons.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Operational Model Shift",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": [
+              "Manual tracking",
+              "High error rate"
+            ],
+            "id": 1,
+            "type": "list"
+          },
+          {
+            "content": [
+              "Automated logs",
+              "Real-time alerts"
+            ],
+            "id": 2,
+            "type": "list"
+          }
+        ],
+        "title": "Current vs. Proposed"
+      },
+      "layout_index": 14,
+      "layout_name": "TWO_OBJECTS",
+      "local_layout_index": 3,
+      "master_index": 3,
+      "max_placeholders_to_fill": 3,
+      "placeholders": [
+        {
+          "content_hint": "Comparison Title",
+          "description": "Header title",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Category A bullets",
+          "description": "Left content pane",
+          "idx": 1,
+          "max_words": 40,
+          "type": "BODY"
+        },
+        {
+          "content_hint": "Category B bullets",
+          "description": "Right content pane",
+          "idx": 2,
+          "max_words": 40,
+          "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "normal",
+      "use_for": "Comparing two distinct sets of data or images side-by-side."
+    },
+    {
+      "content_guidance": "Use this for formal comparisons where each side requires a specific sub-title.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Service Providers",
+            "id": 0,
+            "type": "text"
+          },
+          {
+            "content": "Vendor Alpha",
+            "id": 1,
+            "type": "text"
+          },
+          {
+            "content": [
+              "Global reach",
+              "Premium pricing"
+            ],
+            "id": 2,
+            "type": "list"
+          },
+          {
+            "content": "Vendor Beta",
+            "id": 3,
+            "type": "text"
+          },
+          {
+            "content": [
+              "Local focus",
+              "Cost effective"
+            ],
+            "id": 4,
+            "type": "list"
+          }
+        ],
+        "title": "Vendor Comparison"
+      },
+      "layout_index": 15,
+      "layout_name": "TWO_OBJECTS_WITH_TEXT",
+      "local_layout_index": 4,
+      "master_index": 3,
+      "max_placeholders_to_fill": 5,
+      "placeholders": [
+        {
+          "content_hint": "Title",
+          "description": "Global header",
+          "idx": 0,
+          "max_words": 10,
+          "type": "TITLE"
+        },
+        {
+          "content_hint": "Left Sub-heading",
+          "description": "Left header",
+          "idx": 1,
+          "max_words": 5,
+          "type": "BODY"
+        },
+        {
+          "content_hint": "Left content",
+          "description": "Left body",
+          "idx": 2,
+          "max_words": 40,
+          "type": "BODY"
+        },
+        {
+          "content_hint": "Right Sub-heading",
+          "description": "Right header",
+          "idx": 3,
+          "max_words": 5,
+          "type": "BODY"
+        },
+        {
+          "content_hint": "Right content",
+          "description": "Right body",
+          "idx": 4,
+          "max_words": 40,
+          "type": "BODY"
+        }
+      ],
+      "recommended_position": "middle",
+      "slide_role": "content",
+      "text_density": "normal",
+      "use_for": "Complex dual-column layout with specific header areas for each column."
+    },
+    {
+      "content_guidance": "Place contact info or 'Thank You' in the bottom right subtitle placeholder.",
+      "example": {
+        "placeholders": [
+          {
+            "content": "Questions? email@company.com | [www.company.com](https://www.company.com)",
+            "id": 1,
+            "type": "text"
+          }
+        ],
+        "title": "Contact"
+      },
+      "layout_index": 16,
+      "layout_name": "TITLE",
+      "local_layout_index": 0,
+      "master_index": 4,
+      "max_placeholders_to_fill": 1,
+      "placeholders": [
+        {
+          "content_hint": "Contact details or concluding remark",
+          "description": "Bottom-right contact/info box",
+          "idx": 1,
+          "max_words": 20,
+          "type": "SUBTITLE"
+        }
+      ],
+      "recommended_position": "last",
+      "slide_role": "closing",
+      "text_density": "normal",
+      "use_for": "Closing slide or Contact Us page with a focus on the lower-right area."
+    }
+  ],
+  "schema_source": "manual",
+  "saved_at": "2026-02-22T13:46:53"
+}
